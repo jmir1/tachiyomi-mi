@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import eu.kanade.presentation.browse.GlobalSearchErrorResultItem
 import eu.kanade.presentation.browse.GlobalSearchLoadingResultItem
 import eu.kanade.presentation.browse.GlobalSearchResultItem
@@ -30,6 +34,7 @@ fun GlobalAnimeSearchScreen(
     onClickItem: (Anime) -> Unit,
     onLongClickItem: (Anime) -> Unit,
 ) {
+    val contentFocus = FocusRequester()
     Scaffold(
         topBar = { scrollBehavior ->
             GlobalAnimeSearchToolbar(
@@ -44,6 +49,10 @@ fun GlobalAnimeSearchScreen(
                 onlyShowHasResults = state.onlyShowHasResults,
                 onToggleResults = onToggleResults,
                 scrollBehavior = scrollBehavior,
+                modifier = Modifier
+                    .focusProperties {
+                        down = contentFocus
+                    },
             )
         },
     ) { paddingValues ->
@@ -54,6 +63,7 @@ fun GlobalAnimeSearchScreen(
             onClickSource = onClickSource,
             onClickItem = onClickItem,
             onLongClickItem = onLongClickItem,
+            modifier = Modifier.focusRequester(contentFocus),
         )
     }
 }
@@ -66,10 +76,12 @@ internal fun GlobalSearchContent(
     onClickSource: (AnimeCatalogueSource) -> Unit,
     onClickItem: (Anime) -> Unit,
     onLongClickItem: (Anime) -> Unit,
+    modifier: Modifier = Modifier,
     fromSourceId: Long? = null,
 ) {
     LazyColumn(
         contentPadding = contentPadding,
+        modifier = modifier,
     ) {
         items.forEach { (source, result) ->
             item(key = source.id) {

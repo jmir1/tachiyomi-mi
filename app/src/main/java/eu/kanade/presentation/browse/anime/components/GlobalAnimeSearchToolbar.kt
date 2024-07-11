@@ -45,6 +45,7 @@ fun GlobalAnimeSearchToolbar(
     onlyShowHasResults: Boolean,
     onToggleResults: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
         Box {
@@ -67,7 +68,7 @@ fun GlobalAnimeSearchToolbar(
         }
 
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .horizontalScroll(rememberScrollState())
                 .padding(horizontal = MaterialTheme.padding.small),
             horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),

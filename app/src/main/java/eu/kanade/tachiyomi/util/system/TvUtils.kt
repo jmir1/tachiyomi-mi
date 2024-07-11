@@ -12,6 +12,7 @@ fun isTvBox(context: Context): Boolean {
 
     // TV for sure
     if (
+        pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
         context.getSystemService(UiModeManager::class.java)
             .getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION
     ) {
