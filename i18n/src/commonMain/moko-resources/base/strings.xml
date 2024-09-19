@@ -1167,4 +1167,9 @@
     <string name="download_speed_limit_hint">Set to 0 to disable the speed limit.</string>
     <string name="pref_mpv_scripts">Enable MPV scripts</string>
     <string name="pref_mpv_scripts_summary">Needs external storage permission.</string>
+
+    <!-- Custom Color Picker -->
+    <string name="pref_custom_color">Custom Color Picker</string>
+    <string name="custom_color_description">Pick a color for the custom Theme</string>
+    <string name="theme_custom">Custom Theme</string>
 </resources>

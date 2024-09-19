@@ -85,6 +85,9 @@
     <!-- Monet theme only support S+ -->
     <style name="Theme.Tachiyomi.Monet" />
 
+    <!-- Custom Theme -->
+    <style name="Theme.Tachiyomi.Custom" />
+
     <!--== Cotton Candy Theme ==-->
     <style name="Theme.Tachiyomi.CottonCandy">
         <!-- Theme Colors -->
