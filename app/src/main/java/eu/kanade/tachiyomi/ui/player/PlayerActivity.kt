@@ -1050,23 +1050,6 @@ class PlayerActivity : BaseActivity() {
         )
     }
 
-    private fun clearTracks() {
-        val count = MPVLib.getPropertyInt("track-list/count")!!
-        // Note that because events are async, properties might disappear at any moment
-        // so use ?: continue instead of !!
-        for (i in 0 until count) {
-            val type = MPVLib.getPropertyString("track-list/$i/type") ?: continue
-            val mpvId = MPVLib.getPropertyInt("track-list/$i/id") ?: continue
-            when (type) {
-                "video" -> MPVLib.command(arrayOf("video-remove", "$mpvId"))
-                "audio" -> MPVLib.command(arrayOf("audio-remove", "$mpvId"))
-                "sub" -> MPVLib.command(arrayOf("sub-remove", "$mpvId"))
-            }
-        }
-
-        viewModel.isLoadingTracks.update { _ -> true }
-    }
-
     // TODO: exception java.util.ConcurrentModificationException:
     //  UPDATE: MAY HAVE BEEN FIXED
     // at java.lang.Object java.util.ArrayList$Itr.next() (ArrayList.java:860)
@@ -1076,7 +1059,6 @@ class PlayerActivity : BaseActivity() {
     private fun fileLoaded() {
         setMpvMediaTitle()
         setupPlayerOrientation()
-        clearTracks()
         setupTracks()
 
         // aniSkip stuff
@@ -1093,6 +1075,8 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun setupTracks() {
+        viewModel.isLoadingTracks.update { _ -> true }
+
         val audioTracks = viewModel.videoList.value.getOrNull(viewModel.selectedVideoIndex.value)
             ?.audioTracks?.takeIf { it.isNotEmpty() }
         val subtitleTracks = viewModel.videoList.value.getOrNull(viewModel.selectedVideoIndex.value)
