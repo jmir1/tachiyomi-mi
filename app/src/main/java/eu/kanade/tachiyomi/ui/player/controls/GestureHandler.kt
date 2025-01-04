@@ -206,7 +206,7 @@ fun GestureHandler(
                                     .coerceIn(0 - startingPosition, (duration - startingPosition).toInt()),
                             )
                         }
-                        viewModel.seekTo(it, preciseSeeking)
+                        viewModel.seekTo(it.coerceIn(0, duration.toInt()), preciseSeeking)
                     }
 
                     if (showSeekbar) viewModel.showSeekBar()
