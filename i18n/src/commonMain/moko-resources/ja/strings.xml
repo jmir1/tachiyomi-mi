@@ -851,7 +851,6 @@
     <string name="action_replace_repo">置き換え</string>
     <string name="pref_create_folder_per_manga_summary">エントリのタイトルに従ってフォルダを作成します</string>
     <string name="anime_interval_expected_update">新しいエピソードは %1$s 頃にリリースされると予測されており、%2$s ごとにチェックしています。</string>
-    <string name="pref_media_control_chapter_seeking_summary">有効にすると、チャプタが見つからない場合に「次へ」を使用すると、「イントロをスキップ」ボタンが呼び出されます</string>
     <string name="relative_time_now">いま</string>
     <string name="pref_flash_style_black">黒</string>
     <string name="pref_flash_style_white">白</string>
@@ -869,4 +868,10 @@
     <string name="action_hide">隠す</string>
     <string name="label_category">カテゴリー</string>
     <string name="label_recent_anime_updates">アニメの更新(直近)</string>
+    <string name="action_sort_random">ランダム</string>
+    <string name="label_player_settings">プレイヤー設定</string>
+    <string name="action_search_player_settings">検索、サーチ設定</string>
+    <string name="pref_player_internal">内蔵プレイヤー</string>
+    <string name="action_copy_link">リンクをコピーする</string>
+    <string name="action_add_anyway">どうしても追加する</string>
 </resources>

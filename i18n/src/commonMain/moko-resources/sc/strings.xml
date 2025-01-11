@@ -624,7 +624,7 @@
     <string name="fdroid_warning">Sas versiones de F-Droid non sunt prus suportadas in manera ufitziale.
 \nToca pro nde ischire de prus.</string>
     <string name="track_remove_date_conf_title">Bogare sa data\?</string>
-    <string name="pref_invalidate_download_cache">Invàlida s\'ìnditze de sos iscarrigamentos</string>
+    <string name="pref_invalidate_download_cache">Torra a inditzizare sos iscarrigamentos</string>
     <string name="track_remove_start_date_conf_text">Custu at a bogare sa data de incumintzu seletzionada in antis dae %s</string>
     <string name="track_remove_finish_date_conf_text">Custu at a bogare sa data de fine seletzionada in antis dae %s</string>
     <string name="label_downloaded">Iscarrigados</string>
@@ -807,12 +807,8 @@
     <string name="pref_start_screen">Ischermada de incumintzu</string>
     <string name="action_filter_unseen">Non bìdidos</string>
     <string name="action_mark_as_seen">Marca comente pompiadu</string>
-    <string name="pref_category_progress">Progressu</string>
     <string name="pref_category_player_orientation">Orientamentu</string>
-    <string name="pref_default_player_orientation">Orientamentu predefinidu</string>
-    <string name="go_to_previous_chapter">Capìtulu antepostu</string>
     <string name="action_sort_last_seen">Ùrtimos bìdidos</string>
-    <string name="pref_category_player">Riproduidore</string>
     <string name="onboarding_storage_info">Seletziona una cartella in ue %1$s at a archiviare sos capìtulos iscarrigados, sas còpias de seguresa e àteru.\n\nSi cussìgiat una cartella dedicada.\n\nCartella seletzionada: %2$s</string>
     <string name="onboarding_permission_install_apps">Permissos pro installare s\'aplicatzione</string>
     <string name="onboarding_permission_install_apps_description">Pro installare estensiones de fontes.</string>
@@ -862,5 +858,4 @@
     <string name="pref_player_audio_channels">Canales àudio</string>
     <string name="action_next_episode">Episòdiu imbeniente</string>
     <string name="unofficial_anime_extension_message">Custa estensione non benit dae sa lista ufitziale.</string>
-    <string name="go_to_next_chapter">Capìtulu imbeniente</string>
 </resources>

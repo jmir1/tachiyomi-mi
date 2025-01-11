@@ -569,7 +569,7 @@
     <string name="pref_app_language">ऐप की भाषा</string>
     <string name="delete_category">श्रेणी हटाएँ</string>
     <string name="description_placeholder">कोई विवरण नहीं</string>
-    <string name="delete_category_confirmation">क्या आप %s कैटेगरी को हटाना चाहते हैं \?</string>
+    <string name="delete_category_confirmation">क्या आप %s कैटेगरी को हटाना चाहते हैं ?</string>
     <string name="pref_reset_viewer_flags">प्रति श्रृंखला रीडर सेटिंग्स को रीसेट करें</string>
     <string name="pref_reset_viewer_flags_summary">सभी श्रृंखलाओं के रीडिंग मोड और ओरिएंटेशन को रीसेट करता है</string>
     <string name="pref_reset_viewer_flags_success">सभी रीडर सेटिंग्स रीसेट करें</string>

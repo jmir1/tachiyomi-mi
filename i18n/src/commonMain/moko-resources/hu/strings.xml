@@ -407,7 +407,7 @@
     <string name="action_global_search_hint">Globális keresés…</string>
     <string name="sort_by_upload_date">Feltöltési dátum szerint</string>
     <string name="dialog_with_checkbox_remove_description">Ez eltávolítja a fejezet olvasási dátumát. Biztos benne\?</string>
-    <string name="delete_category_confirmation">Törölni akarja a %s kategóriát \?</string>
+    <string name="delete_category_confirmation">Törölni akarja a %s kategóriát ?</string>
     <string name="internal_error">InternalError: Nézze meg a hibaüzenetet további információért</string>
     <string name="network_not_metered">Csak nem-lemért hálózatokon</string>
     <string name="backup_choice">Mit tartalmazzon a biztonsági mentés\?</string>

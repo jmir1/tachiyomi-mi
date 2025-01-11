@@ -455,7 +455,7 @@
     <string name="action_sort_unread_count">Йулнӑ сыпӑксемпе</string>
     <string name="action_sort_count">Ҫырав шучӗпе</string>
     <string name="action_remove_everything">Пурне те катерт</string>
-    <string name="delete_category_confirmation">«%s» пухмӑш катертесшӗнех-и\?</string>
+    <string name="delete_category_confirmation">«%s» пухмӑш катертесшӗнех-и?</string>
     <string name="delete_category">Пухмӑш катерт</string>
     <string name="action_display_local_badge">Вырӑнти ҫӑл куҫран</string>
     <string name="label_warning">Асӑрхаттару</string>

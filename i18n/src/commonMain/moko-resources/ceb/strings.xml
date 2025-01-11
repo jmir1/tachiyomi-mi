@@ -168,7 +168,7 @@
     <string name="pref_category_security">Seguridad</string>
     <string name="pref_show_nsfw_source">Ipakita sa mga tinubdan ug mga lista sa mga extension</string>
     <string name="pref_dark_theme_pure_black">Purong itom nga dark mode</string>
-    <string name="parental_controls_info">Dili kini makapugong sa dili opisyal o posibleng sayop nga gi-flag nga mga extension gikan sa pag-surf sa NSFW (18+) nga sulod sulod sa app.</string>
+    <string name="parental_controls_info">Dili kini makapugong sa dili opisyal o posibleng sayop na gipasiban-an nga mga ikstinsiyun sukad sa pagbisita ug NSFW (18+) nga kontento sulod sa app.</string>
     <string name="lock_always">Kanunay</string>
     <string name="secure_screen_summary">Ang luwas nga screen nagtago sa mga sulod sa app sa dihang nagbalhin-balhin og mga app ug nag-block sa mga screenshot</string>
     <string name="pref_library_update_interval">Awtomatikong mga update</string>
@@ -322,7 +322,7 @@
     <string name="enhanced_tracking_info">Mga serbisyo nga naghatag dugang nga mga bahin alang sa piho nga mga gigikanan. Awtomatikong gisubay ang Manga kon idugang sa imong librarya.</string>
     <string name="tracking_info">Usa ka paagi nga pag-sync aron ma-update ang pag-uswag sa kapitulo sa mga serbisyo sa pagsubay. I-set up ang tracking para sa indibidwal nga manga entries gikan sa ilang tracking button.</string>
     <string name="enhanced_services">Gipalambo nga mga serbisyo</string>
-    <string name="split_tall_images_summary">Nagpauswag sa pasundayag sa magbabasa pinaagi sa pagbahin sa taas nga na-download nga mga imahe.</string>
+    <string name="split_tall_images_summary">Makausbaw sa sirbisyu sa pambasa</string>
     <string name="services">Mga serbisyo</string>
     <string name="pref_viewer_nav">Pag-tap sa mga zone</string>
     <string name="pref_create_backup">Paghimo og backup</string>
@@ -332,7 +332,7 @@
     <string name="pref_restore_backup_summ">Ibalik ang librarya gikan sa backup file</string>
     <string name="backup_created">Gihimo ang backup</string>
     <string name="pref_backup_interval">Kadaghanon sa pag-backup</string>
-    <string name="invalid_backup_file">Dili balido nga backup file</string>
+    <string name="invalid_backup_file">Imbalidu nga backup file:</string>
     <string name="invalid_backup_file_missing_manga">Ang backup walay bisan unsang manga.</string>
     <string name="backup_restore_missing_sources">Nawala nga mga tinubdan:</string>
     <string name="empty_backup_error">Walay mga entri sa library nga i-back up</string>
@@ -348,9 +348,7 @@
     <string name="backup_in_progress">Ang pag-backup nagpadayon na</string>
     <string name="restore_duration">%02d minuto , %02d ikaduha</string>
     <string name="backup_choice">Unsa ang gusto nimo i-backup\?</string>
-    <string name="backup_restore_content_full">Ang datos gikan sa backup file mapasig-uli.
-\n
-\nKinahanglan nimo nga i-install ang bisan unsang nawala nga mga extension ug mag-log in sa mga serbisyo sa pagsubay pagkahuman aron magamit kini.</string>
+    <string name="backup_restore_content_full">Basin kinahanglan nimo i-instalar ang nawala nga mga ikstinsiyun ug mu-log in sa mga musubay nga mga sirbisyu pagkahuman aron magamit sila.</string>
     <string name="restore_completed">Nakompleto ang pag-uli</string>
     <string name="creating_backup">Paghimo og backup</string>
     <string name="backup_restore_missing_trackers">Ang mga tracker wala naka-log in:</string>

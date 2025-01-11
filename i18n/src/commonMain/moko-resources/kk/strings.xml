@@ -750,4 +750,13 @@
     <string name="label_data_storage">Дерек пен жад</string>
     <string name="delete_downloaded">Жүктелгендерді жою</string>
     <string name="action_set_interval">Аралық орнату</string>
+    <string name="label_player_settings">Ойнатқышты баптау</string>
+    <string name="action_search_player_settings">Ойнатқыш баптауында іздеу</string>
+    <string name="pref_player_internal">Қолданба ойнатқышы</string>
+    <string name="pref_category_external_player">Сыртқы ойнатқыш</string>
+    <string name="action_sort_random">Кездейсоқ</string>
+    <string name="action_copy_link">Сілтемені көшіру</string>
+    <string name="action_ok">ОК</string>
+    <string name="pref_progress_mark_as_seen">Қай кезде бөлімді көрілген деп есептеу керек</string>
+    <string name="pref_preserve_watching_position">Көрілген бөлімдерде де тоқтаған кезді есте сақтау</string>
 </resources>
