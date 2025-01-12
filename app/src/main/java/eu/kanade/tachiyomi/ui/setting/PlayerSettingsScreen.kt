@@ -13,6 +13,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.presentation.more.settings.screen.player.PlayerSettingsMainScreen
+import eu.kanade.presentation.more.settings.screen.player.PlayerSettingsPlayerScreen
 import eu.kanade.presentation.util.DefaultNavigatorScreenTransition
 import eu.kanade.presentation.util.LocalBackPress
 import eu.kanade.presentation.util.Screen
@@ -41,7 +42,7 @@ object PlayerSettingsScreen : Screen() {
             )
         } else {
             Navigator(
-                screen = PlayerSettingsMainScreen,
+                screen = PlayerSettingsPlayerScreen,
             ) {
                 val insets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
                 TwoPanelBox(
