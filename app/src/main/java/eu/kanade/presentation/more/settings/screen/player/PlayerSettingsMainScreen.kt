@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Subtitles
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,6 +38,7 @@ import dev.icerock.moko.resources.StringResource
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.AppBarActions
 import eu.kanade.presentation.more.settings.screen.SettingsSearchScreen
+import eu.kanade.presentation.more.settings.screen.player.custombutton.PlayerSettingsCustomButtonScreen
 import eu.kanade.presentation.more.settings.widget.TextPreferenceWidget
 import eu.kanade.presentation.util.LocalBackPress
 import eu.kanade.presentation.util.Screen
@@ -198,6 +200,12 @@ object PlayerSettingsMainScreen : Screen() {
             subtitleRes = MR.strings.pref_player_audio_summary,
             icon = Icons.Outlined.Audiotrack,
             screen = PlayerSettingsAudioScreen,
+        ),
+        Item(
+            titleRes = MR.strings.pref_player_custom_button,
+            subtitleRes = MR.strings.pref_player_custom_button_summary,
+            icon = Icons.Outlined.Terminal,
+            screen = PlayerSettingsCustomButtonScreen,
         ),
         Item(
             titleRes = MR.strings.pref_player_advanced,

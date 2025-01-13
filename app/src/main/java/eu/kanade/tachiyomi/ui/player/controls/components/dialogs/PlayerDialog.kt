@@ -13,14 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import dev.icerock.moko.resources.StringResource
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.TextButton
 import tachiyomi.presentation.core.i18n.stringResource
 
 @Composable
 fun PlayerDialog(
-    titleRes: StringResource,
+    title: String,
     modifier: Modifier = Modifier,
     onConfirmRequest: (() -> Unit)? = null,
     onDismissRequest: () -> Unit,
@@ -48,7 +47,7 @@ fun PlayerDialog(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = stringResource(titleRes),
+                    text = title,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )

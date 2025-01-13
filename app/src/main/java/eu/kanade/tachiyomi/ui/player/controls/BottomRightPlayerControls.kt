@@ -31,13 +31,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import eu.kanade.tachiyomi.ui.player.controls.components.ControlsButton
+import eu.kanade.tachiyomi.ui.player.execute
+import eu.kanade.tachiyomi.ui.player.executeLongPress
+import tachiyomi.domain.custombuttons.model.CustomButton
 import tachiyomi.presentation.core.components.material.Button
 import tachiyomi.presentation.core.components.material.padding
 
 @Composable
 fun BottomRightPlayerControls(
-    // TODO(customButton)
-    // customButton: CustomButtonEntity?,
+    customButton: CustomButton?,
+    customButtonTitle: String,
     aniskipButton: String?,
     onPressAniSkipButton: () -> Unit,
     isPipAvailable: Boolean,
@@ -63,27 +66,25 @@ fun BottomRightPlayerControls(
                         ),
                 )
             }
+        } else if (customButton != null) {
+            Box(
+                modifier = Modifier.padding(end = MaterialTheme.padding.small),
+            ) {
+                Button(onClick = {}) {
+                    Text(text = customButtonTitle)
+                }
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .combinedClickable(
+                            onClick = { customButton.execute() },
+                            onLongClick = { customButton.executeLongPress() },
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ),
+                )
+            }
         }
-        // TODO(customButton)
-        // if (customButton != null) {
-        //     Box(
-        //         modifier = Modifier.padding(end = MaterialTheme.spacing.smaller),
-        //     ) {
-        //         Button(onClick = {}) {
-        //             Text(text = customButton.title)
-        //         }
-        //         Box(
-        //             modifier = Modifier
-        //                 .matchParentSize()
-        //                 .combinedClickable(
-        //                     onClick = customButton::execute,
-        //                     onLongClick = customButton::executeLongClick,
-        //                     interactionSource = remember { MutableInteractionSource() },
-        //                     indication = null,
-        //                 ),
-        //         )
-        //     }
-        // }
 
         if (isPipAvailable) {
             ControlsButton(

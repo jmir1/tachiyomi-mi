@@ -98,7 +98,7 @@ class AnimeScreenModel(
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
     private val trackPreferences: TrackPreferences = Injekt.get(),
     internal val playerPreferences: PlayerPreferences = Injekt.get(),
-    internal val gesturePreferences: GesturePreferences = Injekt.get(),
+    private val gesturePreferences: GesturePreferences = Injekt.get(),
     private val trackerManager: TrackerManager = Injekt.get(),
     private val trackEpisode: TrackEpisode = Injekt.get(),
     private val downloadManager: AnimeDownloadManager = Injekt.get(),
@@ -341,6 +341,12 @@ class AnimeScreenModel(
                         showChangeCategoryDialog()
                     }
                 }
+
+                // Set default intro length
+                setAnimeViewerFlags.awaitSetSkipIntroLength(
+                    anime.id,
+                    gesturePreferences.defaultIntroLength().get().toLong(),
+                )
 
                 // Finally match with enhanced tracking when available
                 addTracks.bindEnhancedTrackers(anime, state.source)

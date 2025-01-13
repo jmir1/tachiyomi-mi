@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import eu.kanade.tachiyomi.data.database.models.anime.Episode
 import eu.kanade.tachiyomi.ui.player.Dialogs
 import eu.kanade.tachiyomi.ui.player.controls.components.dialogs.EpisodeListDialog
+import eu.kanade.tachiyomi.ui.player.controls.components.dialogs.IntegerPickerDialog
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -33,6 +34,18 @@ fun PlayerDialogs(
                 onBookmarkClicked = onBookmarkClicked,
                 onEpisodeClicked = onEpisodeClicked,
                 onDismissRequest = onDismissRequest,
+            )
+        }
+        is Dialogs.IntegerPicker -> {
+            IntegerPickerDialog(
+                defaultValue = dialogShown.defaultValue,
+                minValue = dialogShown.minValue,
+                maxValue = dialogShown.maxValue,
+                step = dialogShown.step,
+                nameFormat = dialogShown.nameFormat,
+                title = dialogShown.title,
+                onChange = dialogShown.onChange,
+                onDismissRequest = dialogShown.onDismissRequest,
             )
         }
     }

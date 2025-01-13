@@ -94,6 +94,7 @@ import tachiyomi.core.common.util.lang.launchNonCancellable
 import tachiyomi.core.common.util.lang.launchUI
 import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.logcat
+import tachiyomi.domain.custombuttons.model.CustomButton
 import tachiyomi.domain.storage.service.StorageManager
 import tachiyomi.i18n.MR
 import uy.kohesive.injekt.Injekt
@@ -375,9 +376,6 @@ class PlayerActivity : BaseActivity() {
         val configDir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
             storageManager.getMPVConfigDirectory()!!.filePath!!
         } else {
-            if (advancedPlayerPreferences.mpvScripts().get()) {
-                copyScripts()
-            }
             applicationContext.filesDir.path
         }
 
@@ -386,6 +384,7 @@ class PlayerActivity : BaseActivity() {
         val mpvInputFile = File("$configDir/input.conf")
         advancedPlayerPreferences.mpvInput().get().let { mpvInputFile.writeText(it) }
 
+        copyScripts()
         copyAssets(configDir)
         copyFontsDirectory()
 
@@ -402,18 +401,18 @@ class PlayerActivity : BaseActivity() {
     }
 
     private fun copyScripts() {
-        CoroutineScope(Dispatchers.IO).launchIO {
-            // First, delete all present scripts
-            val scriptsDir = {
-                UniFile.fromFile(applicationContext.filesDir)?.createDirectory("scripts")
-            }
-            val scriptOptsDir = {
-                UniFile.fromFile(applicationContext.filesDir)?.createDirectory("script-opts")
-            }
-            scriptsDir()?.delete()
-            scriptOptsDir()?.delete()
+        // First, delete all present scripts
+        val scriptsDir = {
+            UniFile.fromFile(applicationContext.filesDir)?.createDirectory("scripts")
+        }
+        val scriptOptsDir = {
+            UniFile.fromFile(applicationContext.filesDir)?.createDirectory("script-opts")
+        }
+        scriptsDir()?.delete()
+        scriptOptsDir()?.delete()
 
-            // Then, copy the scripts from the Aniyomi directory
+        // Then, copy the scripts from the Aniyomi directory
+        if (advancedPlayerPreferences.mpvScripts().get()) {
             storageManager.getScriptsDirectory()?.listFiles()?.forEach { file ->
                 val outFile = scriptsDir()?.createFile(file.name)
                 outFile?.let {
@@ -426,6 +425,13 @@ class PlayerActivity : BaseActivity() {
                     file.openInputStream().copyTo(it.openOutputStream())
                 }
             }
+        }
+
+        // Copy over the bridge file
+        val luaFile = scriptsDir()?.createFile("aniyomi.lua")
+        val luaBridge = assets.open("aniyomi.lua")
+        luaFile?.openOutputStream()?.bufferedWriter()?.use { scriptLua ->
+            luaBridge.bufferedReader().use { scriptLua.write(it.readText()) }
         }
     }
 
@@ -474,6 +480,48 @@ class PlayerActivity : BaseActivity() {
                 "osd-fonts-dir",
                 applicationContext.filesDir.path,
             )
+        }
+    }
+
+    fun setupCustomButtons(buttons: List<CustomButton>) {
+        CoroutineScope(Dispatchers.IO).launchIO {
+            val scriptsDir = {
+                UniFile.fromFile(applicationContext.filesDir)?.createDirectory("scripts")
+            }
+
+            val primaryButtonId = viewModel.primaryButton.value?.id ?: 0L
+
+            val customButtonsContent = buildString {
+                appendLine("local lua_modules = mp.find_config_file('scripts')")
+                appendLine("if lua_modules then")
+                append(
+                    "package.path = package.path .. ';' .. lua_modules .. '/?.lua;' .. lua_modules .. '/?/init.lua;' .. '",
+                )
+                append(scriptsDir()!!.filePath)
+                appendLine("' .. '/?.lua'")
+                appendLine("end")
+                appendLine("local aniyomi = require 'aniyomi'")
+                buttons.forEach { button ->
+                    appendLine(button.getButtonOnStartup(primaryButtonId))
+                    appendLine("function button${button.id}()")
+                    appendLine(button.getButtonContent(primaryButtonId))
+                    appendLine("end")
+                    appendLine("mp.register_script_message('call_button_${button.id}', button${button.id})")
+                    appendLine("function button${button.id}long()")
+                    appendLine(button.getButtonLongPressContent(primaryButtonId))
+                    appendLine("end")
+                    appendLine("mp.register_script_message('call_button_${button.id}_long', button${button.id}long)")
+                }
+            }
+
+            val file = scriptsDir()?.createFile("custombuttons.lua")
+            file?.openOutputStream()?.bufferedWriter()?.use {
+                it.write(customButtonsContent)
+            }
+
+            file?.let {
+                MPVLib.command(arrayOf("load-script", it.filePath))
+            }
         }
     }
 
@@ -560,6 +608,7 @@ class PlayerActivity : BaseActivity() {
             "volume-max" -> viewModel.volumeBoostCap = value.toInt() - 100
             "chapter" -> viewModel.updateChapter(value)
             "duration" -> viewModel.duration.update { value.toFloat() }
+            "user-data/current-anime/intro-length" -> viewModel.setAnimeSkipIntroLength(value)
         }
     }
 
@@ -570,7 +619,6 @@ class PlayerActivity : BaseActivity() {
                 viewModel.loadChapters()
                 viewModel.updateChapter(0)
             }
-            // TODO(tracklist)
             "track-list" -> viewModel.loadTracks()
         }
     }
@@ -619,8 +667,7 @@ class PlayerActivity : BaseActivity() {
                 viewModel.updateSubtitle(viewModel.selectedSubtitles.value.first, it)
             }
             "hwdec", "hwdec-current" -> viewModel.getDecoder()
-            // TODO(custombutton)
-            // "user-data/mpvkt" -> viewModel.handleLuaInvocation(property, value)
+            "user-data/aniyomi" -> viewModel.handleLuaInvocation(property, value)
         }
     }
 
@@ -1121,6 +1168,9 @@ class PlayerActivity : BaseActivity() {
 
         viewModel.animeTitle.update { _ -> anime.title }
         viewModel.mediaTitle.update { _ -> episode.name }
+
+        // Write to mpv table
+        MPVLib.setPropertyString("user-data/current-anime/episode-title", episode.name)
 
         val epNumber = episode.episode_number.let { number ->
             if (ceil(number) == floor(number)) number.toInt() else number

@@ -13,6 +13,7 @@ data class BackupOptions(
     val readEntries: Boolean = true,
     val appSettings: Boolean = true,
     val extensionRepoSettings: Boolean = true,
+    val customButton: Boolean = true,
     val sourceSettings: Boolean = true,
     val privateSettings: Boolean = false,
     val extensions: Boolean = false,
@@ -27,12 +28,18 @@ data class BackupOptions(
         readEntries,
         appSettings,
         extensionRepoSettings,
+        customButton,
         sourceSettings,
         privateSettings,
         extensions,
     )
 
-    fun canCreate() = libraryEntries || categories || appSettings || extensionRepoSettings || sourceSettings
+    fun canCreate() = libraryEntries ||
+        categories ||
+        appSettings ||
+        extensionRepoSettings ||
+        customButton ||
+        sourceSettings
 
     companion object {
         val libraryOptions = persistentListOf(
@@ -84,6 +91,11 @@ data class BackupOptions(
                 setter = { options, enabled -> options.copy(extensionRepoSettings = enabled) },
             ),
             Entry(
+                label = MR.strings.custom_button_settings,
+                getter = BackupOptions::customButton,
+                setter = { options, enabled -> options.copy(customButton = enabled) },
+            ),
+            Entry(
                 label = MR.strings.source_settings,
                 getter = BackupOptions::sourceSettings,
                 setter = { options, enabled -> options.copy(sourceSettings = enabled) },
@@ -113,9 +125,10 @@ data class BackupOptions(
             readEntries = array[5],
             appSettings = array[6],
             extensionRepoSettings = array[7],
-            sourceSettings = array[8],
-            privateSettings = array[9],
-            extensions = array[10],
+            customButton = array[8],
+            sourceSettings = array[9],
+            privateSettings = array[10],
+            extensions = array[11],
         )
     }
 

@@ -9,6 +9,7 @@ data class RestoreOptions(
     val categories: Boolean = true,
     val appSettings: Boolean = true,
     val extensionRepoSettings: Boolean = true,
+    val customButtons: Boolean = true,
     val sourceSettings: Boolean = true,
     val extensions: Boolean = false,
 ) {
@@ -18,12 +19,18 @@ data class RestoreOptions(
         categories,
         appSettings,
         extensionRepoSettings,
+        customButtons,
         sourceSettings,
         extensions,
     )
 
-    fun canRestore() =
-        libraryEntries || categories || appSettings || extensionRepoSettings || sourceSettings || extensions
+    fun canRestore() = libraryEntries ||
+        categories ||
+        appSettings ||
+        extensionRepoSettings ||
+        customButtons ||
+        sourceSettings ||
+        extensions
 
     companion object {
         val options = persistentListOf(
@@ -48,6 +55,11 @@ data class RestoreOptions(
                 setter = { options, enabled -> options.copy(extensionRepoSettings = enabled) },
             ),
             Entry(
+                label = MR.strings.custom_button_settings,
+                getter = RestoreOptions::customButtons,
+                setter = { options, enabled -> options.copy(customButtons = enabled) },
+            ),
+            Entry(
                 label = MR.strings.source_settings,
                 getter = RestoreOptions::sourceSettings,
                 setter = { options, enabled -> options.copy(sourceSettings = enabled) },
@@ -64,8 +76,9 @@ data class RestoreOptions(
             categories = array[1],
             appSettings = array[2],
             extensionRepoSettings = array[3],
-            sourceSettings = array[4],
-            extensions = array[5],
+            customButtons = array[4],
+            sourceSettings = array[5],
+            extensions = array[6],
         )
     }
 

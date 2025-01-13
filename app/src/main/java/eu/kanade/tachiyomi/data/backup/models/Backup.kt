@@ -19,4 +19,5 @@ data class Backup(
     @ProtoNumber(106) var backupExtensions: List<BackupExtension> = emptyList(),
     @ProtoNumber(107) var backupAnimeExtensionRepo: List<BackupExtensionRepos> = emptyList(),
     @ProtoNumber(108) var backupMangaExtensionRepo: List<BackupExtensionRepos> = emptyList(),
+    @ProtoNumber(109) var backupCustomButton: List<BackupCustomButtons> = emptyList(),
 )

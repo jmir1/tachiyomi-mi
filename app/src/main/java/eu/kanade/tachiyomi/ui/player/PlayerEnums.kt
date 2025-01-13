@@ -108,9 +108,19 @@ enum class Panels {
     VideoFilters,
 }
 
-enum class Dialogs {
-    None,
-    EpisodeList,
+sealed class Dialogs {
+    data object None : Dialogs()
+    data object EpisodeList : Dialogs()
+    data class IntegerPicker(
+        val defaultValue: Int,
+        val minValue: Int,
+        val maxValue: Int,
+        val step: Int,
+        val nameFormat: String,
+        val title: String,
+        val onChange: (Int) -> Unit,
+        val onDismissRequest: () -> Unit,
+    ) : Dialogs()
 }
 
 sealed class PlayerUpdates {

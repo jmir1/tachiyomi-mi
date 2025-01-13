@@ -1,0 +1,56 @@
+import kotlin.Boolean;
+
+CREATE TABLE custom_buttons (
+    _id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    isFavorite INTEGER AS Boolean NOT NULL,
+    sortIndex INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    longPressContent TEXT NOT NULL,
+    onStartup TEXT NOT NULL
+);
+
+-- Insert skip intro button --
+INSERT OR IGNORE INTO custom_buttons (_id, name, isFavorite, sortIndex, content, longPressContent, onStartup)
+VALUES (1, '+85 s', 1, 0, 'local intro_length = mp.get_property_number("user-data/current-anime/intro-length")
+aniyomi.right_seek_by(intro_length)', 'aniyomi.int_picker("Change intro length", "%ds", 0, 255, 1, "user-data/current-anime/intro-length")', 'function update_button(_, length)
+  if length ~= nil then
+    if length == 0 then
+	  aniyomi.hide_button()
+	  return
+	else
+	  aniyomi.show_button()
+	end
+    aniyomi.set_button_title("+" .. length .. " s")
+  end
+end
+
+if $isPrimary then
+  mp.observe_property("user-data/current-anime/intro-length", "number", update_button)
+end');
+
+findAll:
+SELECT *
+FROM custom_buttons
+ORDER BY sortIndex;
+
+insert:
+INSERT INTO custom_buttons(name, isFavorite, sortIndex, content, longPressContent, onStartup)
+VALUES (:name, :isFavorite, :sortIndex, :content, :longPressContent, :onStartup);
+
+delete:
+DELETE FROM custom_buttons
+WHERE _id = :customButtonId;
+
+update:
+UPDATE custom_buttons
+SET name = coalesce(:name, name),
+    isFavorite = coalesce(:isFavorite, isFavorite),
+    sortIndex = coalesce(:sortIndex, sortIndex),
+    content = coalesce(:content, content),
+    longPressContent = coalesce(:longPressContent, longPressContent),
+    onStartup = coalesce(:onStartup, onStartup)
+WHERE _id = :customButtonId;
+
+selectLastInsertedRowId:
+SELECT last_insert_rowid();

@@ -331,7 +331,7 @@ fun DoubleTapToSeekOvals(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         DoubleTapSeekTriangles(isForward = amount > 0)
                         Text(
-                            text = pluralStringResource(MR.plurals.seconds, amount, amount),
+                            text = text ?: pluralStringResource(MR.plurals.seconds, amount, amount),
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center,
                             color = Color.White,

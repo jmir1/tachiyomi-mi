@@ -19,9 +19,12 @@ package eu.kanade.tachiyomi.ui.player.controls.components.sheets
 
 import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -62,10 +65,14 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import eu.kanade.presentation.player.components.PlayerSheet
 import eu.kanade.tachiyomi.ui.player.Decoder
+import eu.kanade.tachiyomi.ui.player.execute
+import eu.kanade.tachiyomi.ui.player.executeLongPress
 import eu.kanade.tachiyomi.ui.player.settings.AdvancedPlayerPreferences
 import eu.kanade.tachiyomi.ui.player.settings.AudioChannels
 import eu.kanade.tachiyomi.ui.player.settings.AudioPreferences
 import `is`.xyz.mpv.MPVLib
+import kotlinx.collections.immutable.ImmutableList
+import tachiyomi.domain.custombuttons.model.CustomButton
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
@@ -81,8 +88,7 @@ fun MoreSheet(
     onStartTimer: (Int) -> Unit,
     onDismissRequest: () -> Unit,
     onEnterFiltersPanel: () -> Unit,
-    // TODO(customButtons)
-    // customButtons: ImmutableList<CustomButtonEntity>,
+    customButtons: ImmutableList<CustomButton>,
     modifier: Modifier = Modifier,
 ) {
     val advancedPreferences = remember { Injekt.get<AdvancedPlayerPreferences>() }
@@ -96,7 +102,8 @@ fun MoreSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(MaterialTheme.padding.medium),
+                .padding(MaterialTheme.padding.medium)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
         ) {
             Row(
@@ -198,39 +205,38 @@ fun MoreSheet(
                 }
             }
 
-            // TODO(customButtons)
-            // if (customButtons.isNotEmpty()) {
-            //    Text(text = stringResource(MR.strings.player_sheets_custom_buttons_title))
-            //    FlowRow(
-            //        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
-            //        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.smaller),
-            //        maxItemsInEachRow = Int.MAX_VALUE,
-            //    ) {
-            //        customButtons.forEach { button ->
-            //
-            //            val inputChipInteractionSource = remember { MutableInteractionSource() }
-            //
-            //            Box {
-            //                FilterChip(
-            //                    onClick = {},
-            //                    label = { Text(text = button.title) },
-            //                    selected = false,
-            //                    interactionSource = inputChipInteractionSource,
-            //                )
-            //                Box(
-            //                    modifier = Modifier
-            //                        .matchParentSize()
-            //                        .combinedClickable(
-            //                            onClick = button::execute,
-            //                            onLongClick = button::executeLongClick,
-            //                            interactionSource = inputChipInteractionSource,
-            //                            indication = null,
-            //                        )
-            //                )
-            //            }
-            //        }
-            //    }
-            // }
+            if (customButtons.isNotEmpty()) {
+                Text(text = stringResource(MR.strings.player_sheets_custom_buttons_title))
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.mediumSmall),
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
+                    maxItemsInEachRow = Int.MAX_VALUE,
+                ) {
+                    customButtons.forEach { button ->
+
+                        val inputChipInteractionSource = remember { MutableInteractionSource() }
+
+                        Box {
+                            FilterChip(
+                                onClick = {},
+                                label = { Text(text = button.name) },
+                                selected = false,
+                                interactionSource = inputChipInteractionSource,
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .combinedClickable(
+                                        onClick = { button.execute() },
+                                        onLongClick = { button.executeLongPress() },
+                                        interactionSource = inputChipInteractionSource,
+                                        indication = null,
+                                    ),
+                            )
+                        }
+                    }
+                }
+            }
             Text(text = stringResource(MR.strings.pref_audio_channels))
             val audioChannels by audioPreferences.audioChannels().collectAsState()
             LazyRow(

@@ -36,6 +36,7 @@ import eu.kanade.tachiyomi.ui.player.controls.components.sheets.ScreenshotSheet
 import eu.kanade.tachiyomi.ui.player.controls.components.sheets.SubtitlesSheet
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import tachiyomi.domain.custombuttons.model.CustomButton
 import java.io.InputStream
 
 @Composable
@@ -75,8 +76,7 @@ fun PlayerSheets(
     // More sheet
     sleepTimerTimeRemaining: Int,
     onStartSleepTimer: (Int) -> Unit,
-    // TODO(customButtons)
-    // buttons: ImmutableList<CustomButtonEntity>,
+    buttons: ImmutableList<CustomButton>,
 
     // Screenshot sheet
     showSubtitles: Boolean,
@@ -156,8 +156,7 @@ fun PlayerSheets(
                 onStartTimer = onStartSleepTimer,
                 onDismissRequest = onDismissRequest,
                 onEnterFiltersPanel = { onOpenPanel(Panels.VideoFilters) },
-                // TODO(customButtons)
-                // customButtons = buttons,
+                customButtons = buttons,
             )
         }
 

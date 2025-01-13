@@ -215,7 +215,20 @@ class AniyomiMPVView(context: Context, attributes: AttributeSet) : BaseMPVView(c
         "paused-for-cache" to MPVLib.mpvFormat.MPV_FORMAT_FLAG,
         "seeking" to MPVLib.mpvFormat.MPV_FORMAT_FLAG,
         "eof-reached" to MPVLib.mpvFormat.MPV_FORMAT_FLAG,
-        "user-data/mpvkt" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+
+        "user-data/aniyomi/show_text" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/toggle_ui" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/show_panel" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/set_button_title" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/reset_button_title" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/switch_episode" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/launch_int_picker" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/pause" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/seek_with_text" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/toggle_button" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+        "user-data/aniyomi/seek_by" to MPVLib.mpvFormat.MPV_FORMAT_STRING,
+
+        "user-data/current-anime/intro-length" to MPVLib.mpvFormat.MPV_FORMAT_INT64,
     )
 
     private fun setupAudioOptions() {

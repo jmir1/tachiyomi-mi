@@ -42,6 +42,8 @@ import eu.kanade.domain.items.episode.model.toDbEpisode
 import eu.kanade.domain.track.anime.interactor.TrackEpisode
 import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.domain.ui.UiPreferences
+import eu.kanade.presentation.more.settings.screen.player.custombutton.CustomButtonFetchState
+import eu.kanade.presentation.more.settings.screen.player.custombutton.getButtons
 import eu.kanade.tachiyomi.animesource.AnimeSource
 import eu.kanade.tachiyomi.animesource.model.SerializableVideo.Companion.toVideoList
 import eu.kanade.tachiyomi.animesource.model.Video
@@ -73,6 +75,8 @@ import eu.kanade.tachiyomi.util.storage.cacheImageDir
 import eu.kanade.tachiyomi.util.system.toast
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.Utils
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -90,6 +94,9 @@ import tachiyomi.core.common.util.lang.launchNonCancellable
 import tachiyomi.core.common.util.lang.withIOContext
 import tachiyomi.core.common.util.lang.withUIContext
 import tachiyomi.core.common.util.system.logcat
+import tachiyomi.domain.category.anime.interactor.GetAnimeCategories
+import tachiyomi.domain.custombuttons.interactor.GetCustomButtons
+import tachiyomi.domain.custombuttons.model.CustomButton
 import tachiyomi.domain.download.service.DownloadPreferences
 import tachiyomi.domain.entries.anime.interactor.GetAnime
 import tachiyomi.domain.entries.anime.model.Anime
@@ -130,6 +137,7 @@ class PlayerViewModel @JvmOverloads constructor(
     private val getAnime: GetAnime = Injekt.get(),
     private val getNextEpisodes: GetNextEpisodes = Injekt.get(),
     private val getEpisodesByAnimeId: GetEpisodesByAnimeId = Injekt.get(),
+    private val getAnimeCategories: GetAnimeCategories = Injekt.get(),
     private val getTracks: GetAnimeTracks = Injekt.get(),
     private val upsertHistory: UpsertAnimeHistory = Injekt.get(),
     private val updateEpisode: UpdateEpisode = Injekt.get(),
@@ -137,6 +145,7 @@ class PlayerViewModel @JvmOverloads constructor(
     internal val playerPreferences: PlayerPreferences = Injekt.get(),
     internal val gesturePreferences: GesturePreferences = Injekt.get(),
     private val basePreferences: BasePreferences = Injekt.get(),
+    private val getCustomButtons: GetCustomButtons = Injekt.get(),
     uiPreferences: UiPreferences = Injekt.get(),
 ) : ViewModel() {
 
@@ -228,7 +237,7 @@ class PlayerViewModel @JvmOverloads constructor(
 
     val sheetShown = MutableStateFlow(Sheets.None)
     val panelShown = MutableStateFlow(Panels.None)
-    val dialogShown = MutableStateFlow(Dialogs.None)
+    val dialogShown = MutableStateFlow<Dialogs>(Dialogs.None)
 
     private val _seekText = MutableStateFlow<String?>(null)
     val seekText = _seekText.asStateFlow()
@@ -246,8 +255,38 @@ class PlayerViewModel @JvmOverloads constructor(
 
     val cachePath: String = activity.cacheDir.path
 
+    private val _customButtons = MutableStateFlow<CustomButtonFetchState>(CustomButtonFetchState.Loading)
+    val customButtons = _customButtons.asStateFlow()
+
+    private val _primaryButtonTitle = MutableStateFlow("")
+    val primaryButtonTitle = _primaryButtonTitle.asStateFlow()
+
+    private val _primaryButton = MutableStateFlow<CustomButton?>(null)
+    val primaryButton = _primaryButton.asStateFlow()
+
     private fun updateAniskipButton(value: String?) {
         _aniskipButton.update { _ -> value }
+    }
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val buttons = getCustomButtons.getAll()
+                buttons.firstOrNull { it.isFavorite }?.let {
+                    _primaryButton.update { _ -> it }
+                    // If the button text is not empty, it has been set buy a lua script in which
+                    // case we don't want to override it
+                    if (_primaryButtonTitle.value.isEmpty()) {
+                        setPrimaryCustomButtonTitle(it)
+                    }
+                }
+                activity.setupCustomButtons(buttons)
+                _customButtons.update { _ -> CustomButtonFetchState.Success(buttons.toImmutableList()) }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e)
+                _customButtons.update { _ -> CustomButtonFetchState.Error(e.message ?: "Unable to fetch buttons") }
+            }
+        }
     }
 
     /**
@@ -544,6 +583,39 @@ class PlayerViewModel @JvmOverloads constructor(
         _areControlsLocked.update { false }
     }
 
+    fun showSheet(sheet: Sheets) {
+        sheetShown.update { sheet }
+        if (sheet == Sheets.None) {
+            showControls()
+        } else {
+            hideControls()
+            panelShown.update { Panels.None }
+            dialogShown.update { Dialogs.None }
+        }
+    }
+
+    fun showPanel(panel: Panels) {
+        panelShown.update { panel }
+        if (panel == Panels.None) {
+            showControls()
+        } else {
+            hideControls()
+            sheetShown.update { Sheets.None }
+            dialogShown.update { Dialogs.None }
+        }
+    }
+
+    fun showDialog(dialog: Dialogs) {
+        dialogShown.update { dialog }
+        if (dialog == Dialogs.None) {
+            showControls()
+        } else {
+            hideControls()
+            sheetShown.update { Sheets.None }
+            panelShown.update { Panels.None }
+        }
+    }
+
     fun seekBy(offset: Int, precise: Boolean = false) {
         MPVLib.command(arrayOf("seek", offset.toString(), if (precise) "relative+exact" else "relative"))
     }
@@ -658,6 +730,107 @@ class PlayerViewModel @JvmOverloads constructor(
         }
     }
 
+    fun handleLuaInvocation(property: String, value: String) {
+        val data = value
+            .removePrefix("\"")
+            .removeSuffix("\"")
+            .ifEmpty { return }
+
+        when (property.substringAfterLast("/")) {
+            "show_text" -> playerUpdate.update { PlayerUpdates.ShowText(data) }
+            "toggle_ui" -> {
+                when (data) {
+                    "show" -> showControls()
+                    "toggle" -> {
+                        if (controlsShown.value) hideControls() else showControls()
+                    }
+                    "hide" -> {
+                        sheetShown.update { Sheets.None }
+                        panelShown.update { Panels.None }
+                        dialogShown.update { Dialogs.None }
+                        hideControls()
+                    }
+                }
+            }
+            "show_panel" -> {
+                when (data) {
+                    "subtitle_settings" -> showPanel(Panels.SubtitleSettings)
+                    "subtitle_delay" -> showPanel(Panels.SubtitleDelay)
+                    "audio_delay" -> showPanel(Panels.AudioDelay)
+                    "video_filters" -> showPanel(Panels.VideoFilters)
+                }
+            }
+            "set_button_title" -> {
+                _primaryButtonTitle.update { _ -> data }
+            }
+            "reset_button_title" -> {
+                _customButtons.value.getButtons().firstOrNull { it.isFavorite }?.let {
+                    setPrimaryCustomButtonTitle(it)
+                }
+            }
+            "switch_episode" -> {
+                when (data) {
+                    "n" -> changeEpisode(false)
+                    "p" -> changeEpisode(true)
+                }
+            }
+            "launch_int_picker" -> {
+                val (title, nameFormat, start, stop, step, pickerProperty) = data.split("|")
+                val defaultValue = MPVLib.getPropertyInt(pickerProperty)
+                showDialog(
+                    Dialogs.IntegerPicker(
+                        defaultValue = defaultValue,
+                        minValue = start.toInt(),
+                        maxValue = stop.toInt(),
+                        step = step.toInt(),
+                        nameFormat = nameFormat,
+                        title = title,
+                        onChange = { MPVLib.setPropertyInt(pickerProperty, it) },
+                        onDismissRequest = { showDialog(Dialogs.None) },
+                    ),
+                )
+            }
+            "pause" -> {
+                when (data) {
+                    "pause" -> pause()
+                    "unpause" -> unpause()
+                    "pauseunpause" -> pauseUnpause()
+                }
+            }
+            "seek_with_text" -> {
+                val (seekValue, text) = data.split("|", limit = 2)
+                if (seekValue.toFloat() < pos.value) {
+                    leftSeekToWithText(seekValue.toInt(), text)
+                } else {
+                    rightSeekToWithText(seekValue.toInt(), text)
+                }
+            }
+            "toggle_button" -> {
+                when (data) {
+                    "h" -> _primaryButton.update { null }
+                    "s" -> {
+                        if (_primaryButton.value == null) {
+                            _primaryButton.update {
+                                _customButtons.value.getButtons().firstOrNull { it.isFavorite }
+                            }
+                        }
+                    }
+                }
+            }
+            "seek_by" -> {
+                val (dir, seekValue) = data.split("|")
+                when (dir) {
+                    "l" -> leftSeekBy(seekValue.toInt())
+                    "r" -> rightSeekBy(seekValue.toInt())
+                }
+            }
+        }
+
+        MPVLib.setPropertyString(property, "")
+    }
+
+    private operator fun <T> List<T>.component6(): T = get(5)
+
     private val doubleTapToSeekDuration = gesturePreferences.skipLengthPreference().get()
 
     fun updateSeekAmount(amount: Int) {
@@ -668,21 +841,37 @@ class PlayerViewModel @JvmOverloads constructor(
         _seekText.update { _ -> value }
     }
 
-    fun leftSeek() {
+    fun leftSeekBy(value: Int) {
         if (pos.value > 0) {
-            _doubleTapSeekAmount.value -= doubleTapToSeekDuration
+            _doubleTapSeekAmount.value -= value
         }
         _isSeekingForwards.value = false
-        seekBy(-doubleTapToSeekDuration, gesturePreferences.playerSmoothSeek().get())
+        seekBy(-value, gesturePreferences.playerSmoothSeek().get())
         if (gesturePreferences.showSeekBar().get()) showSeekBar()
     }
 
-    fun rightSeek() {
+    fun rightSeekBy(value: Int) {
         if (pos.value < duration.value) {
-            _doubleTapSeekAmount.value += doubleTapToSeekDuration
+            _doubleTapSeekAmount.value += value
         }
         _isSeekingForwards.value = true
-        seekBy(doubleTapToSeekDuration, gesturePreferences.playerSmoothSeek().get())
+        seekBy(value, gesturePreferences.playerSmoothSeek().get())
+        if (gesturePreferences.showSeekBar().get()) showSeekBar()
+    }
+
+    fun leftSeek() {
+        leftSeekBy(doubleTapToSeekDuration)
+    }
+
+    fun rightSeek() {
+        rightSeekBy(doubleTapToSeekDuration)
+    }
+
+    private fun leftSeekToWithText(seekValue: Int, text: String?) {
+        _isSeekingForwards.value = false
+        _doubleTapSeekAmount.value = -1
+        _seekText.update { _ -> text }
+        seekTo(seekValue)
         if (gesturePreferences.showSeekBar().get()) showSeekBar()
     }
 
@@ -916,6 +1105,16 @@ class PlayerViewModel @JvmOverloads constructor(
 
                 _hasPreviousEpisode.update { _ -> getCurrentEpisodeIndex() != 0 }
                 _hasNextEpisode.update { _ -> getCurrentEpisodeIndex() != currentPlaylist.value.size - 1 }
+
+                // Write to mpv table
+                MPVLib.setPropertyString("user-data/current-anime/anime-title", anime.title)
+                MPVLib.setPropertyInt("user-data/current-anime/intro-length", anime.skipIntroLength)
+                MPVLib.setPropertyString(
+                    "user-data/current-anime/category",
+                    getAnimeCategories.await(anime.id).joinToString {
+                        it.name
+                    },
+                )
 
                 val currentEp = currentEpisode.value ?: throw Exception("No episode loaded.")
                 if (vidList.isNotBlank()) {
@@ -1283,19 +1482,6 @@ class PlayerViewModel @JvmOverloads constructor(
     }
 
     /**
-     * Returns the skipIntroLength used by this anime or the default one.
-     */
-    fun getAnimeSkipIntroLength(resolveDefault: Boolean = true): Int {
-        val default = gesturePreferences.defaultIntroLength().get()
-        val anime = currentAnime.value ?: return default
-        val skipIntroLength = anime.skipIntroLength
-        return when {
-            resolveDefault && skipIntroLength <= 0 -> default
-            else -> anime.skipIntroLength
-        }
-    }
-
-    /**
      * Updates the skipIntroLength for the open anime.
      */
     fun setAnimeSkipIntroLength(skipIntroLength: Long) {
@@ -1449,11 +1635,23 @@ class PlayerViewModel @JvmOverloads constructor(
         }
     }
 
+    fun setPrimaryCustomButtonTitle(button: CustomButton) {
+        _primaryButtonTitle.update { _ -> button.name }
+    }
+
     sealed class Event {
         data class SetCoverResult(val result: SetAsCover) : Event()
         data class SavedImage(val result: SaveImageResult) : Event()
         data class ShareImage(val uri: Uri, val seconds: String) : Event()
     }
+}
+
+fun CustomButton.execute() {
+    MPVLib.command(arrayOf("script-message", "call_button_$id"))
+}
+
+fun CustomButton.executeLongPress() {
+    MPVLib.command(arrayOf("script-message", "call_button_${id}_long"))
 }
 
 fun Float.normalize(inMin: Float, inMax: Float, outMin: Float, outMax: Float): Float {
