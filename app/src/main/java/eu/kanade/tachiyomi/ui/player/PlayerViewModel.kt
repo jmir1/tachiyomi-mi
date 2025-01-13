@@ -897,6 +897,7 @@ class PlayerViewModel @JvmOverloads constructor(
         return try {
             val anime = getAnime.await(animeId)
             if (anime != null) {
+                _currentAnime.update { _ -> anime }
                 animeTitle.update { _ -> anime.title }
                 sourceManager.isInitialized.first { it }
                 if (episodeId == -1L) episodeId = initialEpisodeId
@@ -911,7 +912,6 @@ class PlayerViewModel @JvmOverloads constructor(
                 val source = sourceManager.getOrStub(anime.source)
 
                 _currentEpisode.update { _ -> episode }
-                _currentAnime.update { _ -> anime }
                 _currentSource.update { _ -> source }
 
                 _hasPreviousEpisode.update { _ -> getCurrentEpisodeIndex() != 0 }
