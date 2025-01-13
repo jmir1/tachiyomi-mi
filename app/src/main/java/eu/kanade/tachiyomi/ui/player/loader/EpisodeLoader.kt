@@ -62,11 +62,11 @@ class EpisodeLoader {
          * @param source the online source of the episode.
          */
         private suspend fun isHttp(episode: Episode, source: AnimeHttpSource): List<Video> {
-            val videos = source.getVideoList(episode.toSEpisode())
+            val videos = source.getVideoList(episode.toSEpisode()).map {
+                it.apply { status = Video.State.LOAD_VIDEO }
+            }
 
             videos.filter { it.videoUrl.isNullOrEmpty() }.forEach { video ->
-                video.status = Video.State.LOAD_VIDEO
-
                 try {
                     video.videoUrl = source.getVideoUrl(video)
                     video.status = Video.State.READY

@@ -80,11 +80,14 @@ import eu.kanade.tachiyomi.util.SubtitleSelect
 import eu.kanade.tachiyomi.util.system.toShareIntent
 import eu.kanade.tachiyomi.util.system.toast
 import `is`.xyz.mpv.MPVLib
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
@@ -936,16 +939,19 @@ class PlayerActivity : BaseActivity() {
         )
     }
 
+    private var videoLoadingJob: Job? = null
     fun setVideoList(
         qualityIndex: Int,
         videos: List<Video>?,
         fromStart: Boolean = false,
         position: Long? = null,
     ) {
+        videoLoadingJob?.cancel()
         if (player.isExiting) return
         viewModel.updateVideoList(videos ?: emptyList())
         if (videos == null) return
 
+        viewModel.pause()
         videos.getOrNull(qualityIndex)?.let {
             viewModel.setVideoIndex(qualityIndex)
             setHttpOptions(it)
@@ -966,7 +972,42 @@ class PlayerActivity : BaseActivity() {
                 }
             }
 
-            MPVLib.command(arrayOf("loadfile", parseVideoUrl(it.videoUrl)))
+            videoLoadingJob = CoroutineScope(Dispatchers.IO).launch {
+                if (this.coroutineContext.job.isCancelled) {
+                    return@launch
+                }
+
+                var vidUrl = it.videoUrl
+                if (viewModel.isEpisodeOnline() == true && it.status != Video.State.READY) {
+                    val source = viewModel.currentSource.value as? AnimeHttpSource ?: return@launch
+                    try {
+                        vidUrl = source.resolveVideoUrl(it)
+                        it.status = Video.State.READY
+                        it.videoUrl = vidUrl
+                    } catch (e: Exception) {
+                        if (e is CancellationException) {
+                            throw e
+                        }
+
+                        it.status = Video.State.ERROR
+                        toast("An error occurred while loading the video.")
+                        logcat(LogPriority.ERROR, e)
+                        return@launch
+                    }
+                }
+
+                if (this.coroutineContext.job.isCancelled) {
+                    return@launch
+                }
+
+                if (vidUrl == null) {
+                    toast("An error occurred while loading the video.")
+                    return@launch
+                }
+                viewModel.updateVideoList(videos)
+                MPVLib.command(arrayOf("loadfile", parseVideoUrl(vidUrl)))
+                viewModel.unpause()
+            }
         }
     }
 
