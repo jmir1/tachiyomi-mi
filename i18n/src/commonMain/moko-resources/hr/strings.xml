@@ -696,7 +696,7 @@
     <string name="exception_unknown_host">Nije bilo moguće povezati se s računalom %s</string>
     <string name="action_move_to_bottom_all_for_series">Pomakni seriju na kraj</string>
     <string name="pref_relative_format">Relativne vremenske oznake</string>
-    <string name="pref_relative_format_summary">„%1$s” umjesto „%2$s”</string>
+    <string name="pref_relative_format_summary">\"%1$s\" umjesto \"%2$s\\</string>
     <string name="action_sort_category">Razvrstaj kategorije</string>
     <string name="notification_updating_progress">Aktualiziranje biblioteke … (%s)</string>
     <string name="sort_category_confirmation">Želiš li razvrstati kategorije po abecedi\?</string>
@@ -813,7 +813,7 @@
     <string name="pref_waiting_time_aniskip_8">8 sekunda</string>
     <string name="pref_waiting_time_aniskip_9">9 sekunda</string>
     <string name="pref_waiting_time_aniskip_10">10 sekunda</string>
-    <string name="player_aniskip_dontskip_toast">Preskoči za %d sekunde</string>
+    <string name="player_aniskip_dontskip_toast">%s se preskače za %d sekunde</string>
     <string name="player_aniskip_skip">%s preskočeno</string>
     <string name="player_hwdec_mode">Modus hardverskog dekodiranja</string>
     <string name="notification_episodes_multiple">Epizode %1$s</string>
@@ -861,7 +861,7 @@
     <string name="pref_library_anime_columns">Broj animeova po retku</string>
     <string name="pref_waiting_time_aniskip_6">6 sekunda</string>
     <string name="label_migration_manga">Migriraj manga</string>
-    <string name="pref_preserve_watching_position">Zadrži poziciju gledanja za poglene epizode</string>
+    <string name="pref_preserve_watching_position">Zadrži poziciju gledanja za pogledane epizode</string>
     <string name="rotation_sensor_landscape">Ležeći format</string>
     <string name="pref_waiting_time_aniskip_7">7 sekunda</string>
     <string name="label_anime_library">Anime</string>
@@ -904,7 +904,7 @@
     <string name="pref_bottom_nav_style">Stil donje navigacije</string>
     <string name="default_anime_category">Standardna anime kategorija</string>
     <string name="unofficial_extension_message_aniyomi">Ovo proširenje nije sa službenog popisa Aniyomi proširenja.</string>
-    <string name="rotation_reverse_landscape">Preokreni u ležeći format</string>
+    <string name="rotation_reverse_landscape">Preokreni ležeći format</string>
     <string name="rotation_sensor_portrait">Uspravni format</string>
     <string name="pref_progress_mark_as_seen">U kojem trenutku označiti epizodu kao pogledanu</string>
     <string name="pref_category_player_orientation">Položaj</string>
@@ -1106,7 +1106,7 @@
     <string name="pref_media_previous">Prethodni</string>
     <string name="single_action_seek">Premotaj</string>
     <string name="pref_double_tap_info">Kada je gesta dodira postavljena na „Prilagođeno”, može se vezati putem input.conf. Kodovi tipki su 0x10001 za lijevo, 0x10002 za sredinu i 0x10003 za desno.</string>
-    <string name="single_action_switch">Zamijeni epizodu</string>
+    <string name="single_action_switch">Promijeni epizodu</string>
     <string name="pref_media_playpause">Pokreni/Pauza</string>
     <string name="pref_media_next">Sljedeći</string>
     <string name="pref_player_decoder">Dekoder</string>
@@ -1146,4 +1146,11 @@
     <string name="non_library_settings">Svi pročitani/gledani unosi</string>
     <string name="ext_confirm_remove">Ukloniti proširenje?</string>
     <string name="remove_private_extension_message">Stvarno želiš ukloniti proširenje „%s”?</string>
+    <string name="rotation_video">Video</string>
+    <string name="pref_category_controls">Kontrole</string>
+    <string name="numeric_chooser_value_too_big">Vrijednost je prevelika</string>
+    <string name="no_prev_episode">Prethodna epizoda nije pronađena!</string>
+    <string name="player_sheets_delay_set_as_default">Postavi kao standardno</string>
+    <string name="player_generic_unit_ms">ms</string>
+    <string name="numeric_chooser_value_too_small">Vrijednost je premalena</string>
 </resources>
