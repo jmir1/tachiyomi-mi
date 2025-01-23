@@ -781,4 +781,16 @@
     <string name="information_webview_required">WebView krävs för Aniyomi</string>
     <string name="download_notifier_download_paused_chapters">Nedladdning pausad</string>
     <string name="channel_new_chapters_episodes">Kapiteluppdateringar</string>
+    <string name="onboarding_storage_help_info">Uppdaterar du från en äldre version och är osäker på vad du ska välja? Se lagringsguiden för mer information.</string>
+    <string name="relative_time_now">Nu</string>
+    <string name="label_player_settings">Player inställningar</string>
+    <string name="pref_player_internal_summary">Framsteg, kontroll, orientering</string>
+    <string name="confirm_exit">Tryck tillbaka igen för att lämna</string>
+    <string name="action_filter_started">Börjat</string>
+    <string name="onboarding_storage_help_action">Lagringsguiden</string>
+    <string name="label_upcoming">Kommande</string>
+    <string name="action_add_anyway">Addera ändå</string>
+    <string name="action_migrate_duplicate">Migrera befintlig post</string>
+    <string name="action_sort_random">Slumpmässig</string>
+    <string name="action_copy_link">Kopiera länk</string>
 </resources>

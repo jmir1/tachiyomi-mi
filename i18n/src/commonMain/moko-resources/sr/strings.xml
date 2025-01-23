@@ -724,7 +724,7 @@
     <string name="download_notifier_download_paused_chapters">Преузимање заустављено</string>
     <string name="channel_new_chapters_episodes">Ажурирања поглавља</string>
     <string name="pref_relative_format">Релативне временске ознаке</string>
-    <string name="pref_relative_format_summary">1$s уместо 2$s\\</string>
+    <string name="pref_relative_format_summary">1$s уместо 2$s</string>
     <string name="pref_library_update_smart_update">Паметно ажурирање</string>
     <string name="pref_flash_page">Забљесни приликом листања</string>
     <string name="pref_flash_page_summ">Смањује артефакте на е-инк екранима</string>
