@@ -286,7 +286,7 @@
     <string name="action_move_to_bottom">نقل إلى الأسفل</string>
     <string name="lock_never">أبدًا</string>
     <string name="lock_always">دائماً</string>
-    <string name="lock_when_idle">أوصد في حالة السكون</string>
+    <string name="lock_when_idle">أقفل في حالة السكون</string>
     <string name="lock_with_biometrics">اطلب فتح القفل</string>
     <string name="pref_category_security">الأمان و الخصوصية</string>
     <string name="pref_manage_notifications">أدر الإشعارات</string>
@@ -308,7 +308,7 @@
     <string name="pref_category_display">العرض</string>
     <string name="hide_notification_content">أخفِ محتوى الإشعارات</string>
     <string name="secure_screen_summary">تُخفي الشاشة الآمنة محتوى التطبيق عند التبديل بين التطبيقات، وتمنع التقاط الشاشة كذلك</string>
-    <string name="secure_screen">الشاشة الآمنة</string>
+    <string name="secure_screen">تأمين الشاشة</string>
     <string name="label_downloaded_only">المُنزل فقط</string>
     <string name="check_for_updates">تحقَّق من وجود تحديثات</string>
     <string name="licenses">التراخيص مفتوحة المصدر</string>
@@ -369,7 +369,7 @@
     <string name="action_disable_all">تعطيل الكل</string>
     <string name="pref_show_reading_mode_summary">إظهار الوضع الحالي لفترةٍ وجيزةٍ عند فتح القارئ</string>
     <string name="pref_show_reading_mode">إظهار وضع القراءة</string>
-    <string name="pref_category_theme">السمة</string>
+    <string name="pref_category_theme">النمط</string>
     <string name="action_disable">تعطيل</string>
     <string name="action_start">ابدأ</string>
     <string name="action_sort_date_added">تاريخ الإضافة</string>
@@ -479,9 +479,9 @@
     <string name="information_empty_category_dialog">ليس لديك اي قوائم بعد.</string>
     <string name="action_start_downloading_now">ابدأ التحميل الآن</string>
     <string name="theme_strawberrydaiquiri">أحمر</string>
-    <string name="theme_midnightdusk">منتصف الليل</string>
+    <string name="theme_midnightdusk">غسق منتصف الليل</string>
     <string name="theme_greenapple">أخضر</string>
-    <string name="pref_app_theme">مظهر التطبيق</string>
+    <string name="pref_app_theme">نمط التطبيق</string>
     <string name="pref_lowest">أدنى</string>
     <string name="pref_low">دنيا</string>
     <string name="pref_high">عالية</string>
@@ -491,7 +491,7 @@
     <string name="theme_yotsuba">يوتسوبا</string>
     <string name="theme_yinyang">ين &amp; يانغ</string>
     <string name="theme_tako">تاكو</string>
-    <string name="theme_monet">ديناميك</string>
+    <string name="theme_monet">ديناميكي</string>
     <string name="about_dont_kill_my_app">تقوم بعض الشركات المصنعة بوضع قيود إضافية على التطبيقات التي قد تقضي على الخدمات التي تعمل في الخلفية. يحتوي هذا الموقع على مزيد من المعلومات حول كيفية إصلاحه.</string>
     <string name="restore_miui_warning">قد لا يعمل النسخ الاحتياطيُّ أو الاستعادة إن عطِّلت أمثَلَة MIUI.</string>
     <string name="enhanced_tracking_info">يُحسِّن مصادر معينة، وتُتابَع المدخلات حال إضافتها للمكتبة.</string>
@@ -605,15 +605,15 @@
     <string name="crash_screen_description">واجه %s خطأً غير متوقَّع. تنبغي لك مشاركة سجلَّات الانهيار في قناة الدعم في دسكورد.</string>
     <string name="crash_screen_title">عفوًا!</string>
     <string name="crash_screen_restart_application">أعد تشغيل التطبيق</string>
-    <string name="pref_appearance_summary">مظهر، التاريخ والوقت</string>
-    <string name="pref_library_summary">الفئات، التحديث الشامل، تمرير الفصول</string>
+    <string name="pref_appearance_summary">تعديل النمط والتاريخ والوقت</string>
+    <string name="pref_library_summary">الفئات، التحديث الشامل، عند سحب الحلقة/الفصل</string>
     <string name="pref_reader_summary">وضع القراءة، العرض، التنقل</string>
     <string name="pref_downloads_summary">التحميل التلقائي، التحميل مقدما</string>
     <string name="pref_tracking_summary">تزامن التقدم أحادي الاتجاه، مزامنة محسّنة</string>
-    <string name="pref_browse_summary">المصادر، الامتدادات، البحث العالمي</string>
-    <string name="pref_backup_summary">النسخ الاحتياطي اليدوي والآلي وحيِّز التخزين</string>
-    <string name="pref_security_summary">قفل التطبيق، شاشة آمنة</string>
-    <string name="pref_advanced_summary">تفريغ سجلات الأعطال وتحسينات البطارية</string>
+    <string name="pref_browse_summary">المصادر، الامتدادات، البحث العام</string>
+    <string name="pref_backup_summary">النسخ الاحتياطي اليدوي والآلي ،حيِّز التخزين</string>
+    <string name="pref_security_summary">قفل التطبيق، تأمين الشاشة</string>
+    <string name="pref_advanced_summary">تفريغ سجلات الأعطال، تحسينات البطارية</string>
     <string name="fdroid_warning">لا يتم دعم إصدارات F-Droid رسميا.
 \nانقر لمعرفة المزيد.</string>
     <string name="invalid_location">موقع غير صالح: %s</string>
@@ -792,7 +792,7 @@
     <string name="pref_player_smooth_seek">تمكين البحث الدقيق</string>
     <string name="player_aniskip_mixedOp">تخطي المقدمة المختلطة</string>
     <string name="action_change_intro_length">تغيير طول المقدمة</string>
-    <string name="video_fit_screen">ملائمة الشاشة</string>
+    <string name="video_fit_screen">ملائمة للشاشة</string>
     <string name="pref_mpv_conf">قم بتحرير ملف تكوين MPV لمزيد من إعدادات مشغل الوسائط</string>
     <string name="pref_remove_exclude_categories_anime">فئات الأنمي المستبعدة</string>
     <string name="pref_backup_flags_summary">ما هي المعلومات المراد تضمينها في ملف النسخ الاحتياطي</string>
@@ -907,7 +907,7 @@
     <string name="video_crop_screen">اقتصاص على الشاشة</string>
     <string name="download_notifier_download_paused_episodes">تم إيقاف تنزيل الحلقة مؤقتا</string>
     <string name="episode_settings_updated">تم تحديث الإعدادات الافتراضية للحلقة</string>
-    <string name="video_stretch_screen">امتدت إلى الشاشة</string>
+    <string name="video_stretch_screen">تمديد العرض لتسع الشاشة</string>
     <string name="pref_player_smooth_seek_summary">عند التمكين، لن يركز البحث على الإطارات المفتاحية، مما يجعل البحث أكثر دقة وأيضا ابطأ</string>
     <string name="pref_remember_volume">تذكر وقم بالتغيير إلى آخر مستوى صوت تم إستخدامه</string>
     <string name="pref_remember_brightness">تذكر وقم بالتغيير إلى آخر سطوع تم استخدامه</string>
@@ -1086,7 +1086,7 @@
     <string name="download_speed_limit">حد سرعة التنزيل</string>
     <string name="download_speed_limit_hint">اضبطه على 0 لتعطيل حد السرعة.</string>
     <string name="pref_mpv_scripts">تمكين سكربتات MPV</string>
-    <string name="pref_mpv_scripts_summary">يحتاج إلى إذن التخزين الخارجي.</string>
+    <string name="pref_mpv_scripts_summary">يحتاج إلى إذن تخزين خارجي.</string>
     <string name="action_sort_random">عشوائي</string>
     <string name="label_player_settings">إعدادات المشغل</string>
     <string name="action_search_player_settings">بحث في إعدادات المشغل</string>
@@ -1147,7 +1147,7 @@
     <string name="player_sheets_sub_delay_subtitle_type_primary">الترجمة الأساسية</string>
     <string name="player_sheets_sub_delay_subtitle_voice_heard">تم سماع الصوت</string>
     <string name="player_sheets_sub_delay_subtitle_text_seen">تم عرض النص</string>
-    <string name="player_sheets_sub_delay_sound_sound_spotted">تم التعرف على الصوت</string>
+    <string name="player_sheets_sub_delay_sound_sound_spotted">تم رصد الصوت</string>
     <string name="player_sheets_subtitles_color_background">الخلفية</string>
     <string name="player_sheets_sub_delay_audio_sound_heard">صوت مسموع</string>
     <string name="player_sheets_sub_colors_title">ألوان الترجمة</string>
@@ -1161,7 +1161,7 @@
     <string name="player_sheets_filters_brightness">السطوع</string>
     <string name="player_sheets_subtitles_border_style_background_box">صندوق خلفي</string>
     <string name="player_sheets_sub_misc_title">إعدادات متنوعة</string>
-    <string name="player_sheets_sub_override_ass">تجاوز ASS</string>
+    <string name="player_sheets_sub_override_ass">تجاوز ترجمة ASS/SSA</string>
     <string name="player_sheets_sub_scale">المقياس</string>
     <string name="player_sheets_sub_position">الموضع</string>
     <string name="player_sheets_filters_title">الفلاتر</string>
@@ -1170,7 +1170,7 @@
     <string name="player_sheets_filters_Saturation">التشبع</string>
     <string name="player_sheets_filters_hue">الصبغة</string>
     <string name="player_sheets_add_ext_audio">إضافة صوت خارجي</string>
-    <string name="player_sheets_filters_warning">قد لا تعمل بعض المرشحات على برنامج تشغيل الفيديو الحالي لديك</string>
+    <string name="player_sheets_filters_warning">قد لا تعمل بعض الفلاتر على برنامج تشغيل الفيديو الحالي لديك</string>
     <string name="player_sheets_decoder_formatted">%s (%s)</string>
     <string name="player_sheets_tracks_off">إيقاف المسارات</string>
     <string name="player_sheets_custom_buttons_title">أزرار مخصصة</string>
@@ -1179,7 +1179,7 @@
     <string name="player_seek_n_seconds">%d ثانية</string>
     <string name="timer_picker_enter_timer">أدخل الوقت</string>
     <string name="timer_picker_pick_time">حدد الوقت</string>
-    <string name="timer_cancel_timer">إلغاء المؤقت</string>
+    <string name="timer_cancel_timer">إلغاء المؤقت الحالي</string>
     <string name="player_sheets_speed_slider_label">السرعة</string>
     <string name="timer_remaining">%s الوقت المتبقي</string>
     <string name="ext_remove">إزالة</string>
@@ -1222,7 +1222,7 @@
     <string name="pref_audio_channels">قنوات الصوت</string>
     <string name="pref_audio_pitch_correction_title">تصحيح طبقة الصوت</string>
     <string name="player_sheets_add_ext_sub">إضافة ترجمة خارجية</string>
-    <string name="player_sheets_subtitles_footer_secondary_sid_no_styles">لا توجد أنماط.</string>
+    <string name="player_sheets_subtitles_footer_secondary_sid_no_styles">لن تحظى الترجمة الثانوية بانماط ASS/SSA.</string>
     <string name="add_repo_confirmation">هل ترغب في إضافة المستودع ”%s“؟</string>
     <string name="trackers_updated_summary_anime">تم تحديث المتتبعات إلى الحلقة %d</string>
     <string name="player_sheets_speed_make_default">تعيين كسرعة افتراضية</string>
@@ -1231,4 +1231,18 @@
     <string name="pref_use_yuv420p_subtitle">إعدادات YUV420P</string>
     <string name="pref_media_info">عند تعيين عنصر تحكم الوسائط إلى مخصص، يمكن ربطه من خلال input.conf. رموز المفاتيح هي 0x10004 للسابق، و 0x10005 للتشغيل/الإيقاف المؤقت، و 0x10006 للتالي.</string>
     <string name="pref_audio_pitch_correction_summary">يمنع الصوت من أن يصبح عالي النبرة عند السرعات العالية ومنخفض النبرة عند السرعات البطيئة</string>
+    <string name="pref_player_custom_button_summary">تفعيل كود لوا (lua) مع الأزرار المخصصة</string>
+    <string name="pref_player_custom_button_header">تعديل الأزرار المخصصة</string>
+    <string name="pref_player_custom_button_guide">دليل الأزرار المخصصة</string>
+    <string name="pref_player_custom_button_add">أضف زراً</string>
+    <string name="pref_player_custom_button_edit">تعديل الزر</string>
+    <string name="pref_player_custom_button_title">العنوان</string>
+    <string name="pref_player_custom_button_error_exists">الزر موجود مسبقاً!</string>
+    <string name="pref_player_custom_button_content">كود لوا (lua)</string>
+    <string name="pref_player_custom_button_content_long">كود لوا (lua) (بالضغط المطول)</string>
+    <string name="pref_player_custom_button_optional">(إختياري)</string>
+    <string name="pref_player_custom_button_delete">زر الحذف</string>
+    <string name="pref_player_custom_button_delete_confirm">هل تريد حذف زر %s؟</string>
+    <string name="pref_player_custom_button_empty">ليس لديك أزرار مخصصة. اضغط على علامة الزائد لإنشاء زر مخصص.</string>
+    <string name="pref_player_custom_button">أزرار مخصصة</string>
 </resources>
