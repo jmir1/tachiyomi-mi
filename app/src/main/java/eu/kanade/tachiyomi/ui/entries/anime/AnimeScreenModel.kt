@@ -730,6 +730,7 @@ class AnimeScreenModel(
      */
     fun markEpisodesSeen(episodes: List<Episode>, seen: Boolean) {
         toggleAllSelection(false)
+        if (episodes.isEmpty()) return
         screenModelScope.launchIO {
             setSeenStatus.await(
                 seen = seen,

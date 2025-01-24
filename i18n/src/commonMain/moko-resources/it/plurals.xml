@@ -110,4 +110,9 @@
         <item quantity="many">Prossimi %d episodi</item>
         <item quantity="other"/>
     </plurals>
+    <plurals name="pref_pages">
+        <item quantity="one">1 pagina</item>
+        <item quantity="many">%1$s pagine</item>
+        <item quantity="other">%1$s pagine</item>
+    </plurals>
 </resources>
