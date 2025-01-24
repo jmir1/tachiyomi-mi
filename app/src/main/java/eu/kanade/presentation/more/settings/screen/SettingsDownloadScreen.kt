@@ -81,6 +81,11 @@ object SettingsDownloadScreen : SearchableSettings {
                 title = stringResource(MR.strings.connected_to_wifi),
             ),
             Preference.PreferenceItem.SwitchPreference(
+                pref = downloadPreferences.showEpisodeFileSize(),
+                title = stringResource(MR.strings.show_downloaded_episode_size),
+                subtitle = stringResource(MR.strings.safe_download_summary),
+            ),
+            Preference.PreferenceItem.SwitchPreference(
                 pref = downloadPreferences.safeDownload(),
                 title = stringResource(MR.strings.safe_download),
                 subtitle = stringResource(MR.strings.safe_download_summary),

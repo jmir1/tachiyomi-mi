@@ -20,8 +20,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,8 +41,13 @@ import eu.kanade.presentation.entries.components.DotSeparatorText
 import eu.kanade.presentation.entries.components.ItemCover
 import eu.kanade.presentation.util.animateItemFastScroll
 import eu.kanade.presentation.util.relativeTimeSpanString
+import eu.kanade.tachiyomi.data.download.anime.AnimeDownloadProvider
 import eu.kanade.tachiyomi.data.download.anime.model.AnimeDownload
 import eu.kanade.tachiyomi.ui.updates.anime.AnimeUpdatesItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import tachiyomi.domain.download.service.DownloadPreferences
+import tachiyomi.domain.source.anime.service.AnimeSourceManager
 import tachiyomi.domain.updates.anime.model.AnimeUpdatesWithRelations
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.ListGroupHeader
@@ -48,7 +55,12 @@ import tachiyomi.presentation.core.components.material.DISABLED_ALPHA
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.selectedBackground
+import uy.kohesive.injekt.injectLazy
 import java.util.concurrent.TimeUnit
+
+private val preferences: DownloadPreferences by injectLazy()
+private val animeDownloadProvider: AnimeDownloadProvider by injectLazy()
+private val animeSourceManager: AnimeSourceManager by injectLazy()
 
 internal fun LazyListScope.animeUpdatesLastUpdatedItem(
     lastUpdated: Long,
@@ -135,6 +147,7 @@ internal fun LazyListScope.animeUpdatesUiItems(
                     }.takeIf { !selectionMode },
                     downloadStateProvider = updatesItem.downloadStateProvider,
                     downloadProgressProvider = updatesItem.downloadProgressProvider,
+                    updatesItem = updatesItem,
                 )
             }
         }
@@ -153,6 +166,7 @@ private fun AnimeUpdatesUiItem(
     // Download Indicator
     downloadStateProvider: () -> AnimeDownload.State,
     downloadProgressProvider: () -> Int,
+    updatesItem: AnimeUpdatesItem,
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
@@ -238,12 +252,32 @@ private fun AnimeUpdatesUiItem(
             }
         }
 
+        var fileSizeAsync: Long? by remember { mutableStateOf(updatesItem.fileSize) }
+        if (downloadStateProvider() == AnimeDownload.State.DOWNLOADED &&
+            preferences.showEpisodeFileSize().get() &&
+            fileSizeAsync == null
+        ) {
+            LaunchedEffect(update, Unit) {
+                fileSizeAsync = withContext(Dispatchers.IO) {
+                    animeDownloadProvider.getEpisodeFileSize(
+                        update.episodeName,
+                        null,
+                        update.scanlator,
+                        update.animeTitle,
+                        animeSourceManager.getOrStub(update.sourceId),
+                    )
+                }
+                updatesItem.fileSize = fileSizeAsync
+            }
+        }
+
         EpisodeDownloadIndicator(
             enabled = onDownloadEpisode != null,
             modifier = Modifier.padding(start = 4.dp),
             downloadStateProvider = downloadStateProvider,
             downloadProgressProvider = downloadProgressProvider,
             onClick = { onDownloadEpisode?.invoke(it) },
+            fileSize = fileSizeAsync,
         )
     }
 }

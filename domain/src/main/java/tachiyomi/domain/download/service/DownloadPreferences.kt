@@ -6,6 +6,8 @@ class DownloadPreferences(
     private val preferenceStore: PreferenceStore,
 ) {
 
+    fun showEpisodeFileSize() = preferenceStore.getBoolean("pref_downloaded_episode_size", true)
+
     fun downloadOnlyOverWifi() = preferenceStore.getBoolean(
         "pref_download_only_over_wifi_key",
         true,

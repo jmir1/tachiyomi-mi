@@ -1216,6 +1216,7 @@ sealed class EpisodeList {
         val episode: Episode,
         val downloadState: AnimeDownload.State,
         val downloadProgress: Int,
+        var fileSize: Long? = null,
         val selected: Boolean = false,
     ) : EpisodeList() {
         val id = episode.id
