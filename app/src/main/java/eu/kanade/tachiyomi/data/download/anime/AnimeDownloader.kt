@@ -436,7 +436,7 @@ class AnimeDownloader(
                 }
             }
 
-            video.videoUrl = file.uri.path
+            video.videoUrl = file.uri.path ?: ""
             download.progress = 100
             video.status = Video.State.READY
             progressJob?.cancel()

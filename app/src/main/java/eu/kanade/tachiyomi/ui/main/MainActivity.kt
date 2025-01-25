@@ -10,6 +10,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -563,8 +564,11 @@ class MainActivity : BaseActivity() {
                 } ?: return
                 externalPlayerResult?.launch(intent) ?: return
             } else {
+                // TODO(videolist): Update to hosterlist
+                Log.i("SOMETHING-videoList", videoList.toString())
+                Log.i("SOMETHING-video", video.toString())
                 context.startActivity(
-                    PlayerActivity.newIntent(context, animeId, episodeId, videoList, videoList?.indexOf(video)),
+                    PlayerActivity.newIntent(context, animeId, episodeId, null, -1, -1),
                 )
             }
         }

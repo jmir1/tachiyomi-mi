@@ -16,11 +16,13 @@ import eu.kanade.domain.track.anime.service.DelayedAnimeTrackingUpdateJob
 import eu.kanade.domain.track.anime.store.DelayedAnimeTrackingStore
 import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.tachiyomi.animesource.AnimeSource
+import eu.kanade.tachiyomi.animesource.model.Hoster
 import eu.kanade.tachiyomi.animesource.model.Video
 import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
 import eu.kanade.tachiyomi.data.download.anime.AnimeDownloadManager
 import eu.kanade.tachiyomi.data.track.AnimeTracker
 import eu.kanade.tachiyomi.data.track.TrackerManager
+import eu.kanade.tachiyomi.ui.player.controls.components.sheets.HosterState
 import eu.kanade.tachiyomi.ui.player.loader.EpisodeLoader
 import eu.kanade.tachiyomi.ui.player.settings.PlayerPreferences
 import eu.kanade.tachiyomi.util.system.LocaleHelper
@@ -29,6 +31,8 @@ import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
 import logcat.LogPriority
 import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.core.common.util.lang.withIOContext
@@ -79,12 +83,13 @@ class ExternalIntents {
         anime = getAnime.await(animeId) ?: return null
         source = sourceManager.get(anime.source) ?: return null
         episode = getEpisodesByAnimeId.await(anime.id).find { it.id == episodeId } ?: return null
+        val hosters = EpisodeLoader.getHosters(episode, anime, source)
 
         val video = chosenVideo
-            ?: EpisodeLoader.getLinks(episode, anime, source).firstOrNull()
+            ?: getPreferredVideo(source, hosters)
             ?: throw Exception("Video list is empty")
 
-        val videoUrl = getVideoUrl(context, video) ?: return null
+        val videoUrl = getVideoUrl(source, context, video) ?: return null
 
         val pkgName = playerPreferences.externalPlayerPreference().get()
 
@@ -99,18 +104,59 @@ class ExternalIntents {
         }
     }
 
+    private suspend fun getPreferredVideo(source: AnimeSource, hosterList: List<Hoster>): Video? {
+        val hosterStates = MutableList<HosterState>(hosterList.size) { HosterState.Idle("") }
+        return coroutineScope {
+            val deferredHosters = hosterList.map { hoster ->
+                async {
+                    EpisodeLoader.loadHosterVideos(source, hoster)
+                }
+            }
+
+            deferredHosters.forEachIndexed { hosterIdx, dHoster ->
+                val hosterState = dHoster.await()
+                hosterStates[hosterIdx] = hosterState
+
+                if (hosterState is HosterState.Ready) {
+                    val prefIndex = hosterState.videoList.indexOfFirst { it.preferred }
+                    if (prefIndex != -1) {
+                        val video = hosterState.videoList[prefIndex]
+                        coroutineContext.cancelChildren()
+                        return@coroutineScope video
+                    }
+                }
+            }
+
+            val firstValidHosterIdx = hosterStates.indexOfFirst { hoster ->
+                hoster is HosterState.Ready && hoster.videoList.any { v -> v.videoUrl.isNotEmpty() }
+            }
+            if (firstValidHosterIdx != -1) {
+                val videoList = (hosterStates[firstValidHosterIdx] as HosterState.Ready).videoList
+                videoList.first { it.videoUrl.isNotEmpty() }
+            } else {
+                null
+            }
+        }
+    }
+
     /**
      * Returns the [Uri] of the given video.
      *
      * @param context the application context.
      * @param video the video being sent to the external player.
      */
-    private suspend fun getVideoUrl(context: Context, video: Video): Uri? {
-        if (video.videoUrl == null) {
-            makeErrorToast(context, Exception("Video URL is null."))
+    private suspend fun getVideoUrl(source: AnimeSource, context: Context, video: Video): Uri? {
+        val newVideoUrl = if (source is AnimeHttpSource) {
+            source.resolveVideoUrl(video)
+        } else {
+            video.videoUrl
+        }
+
+        if (newVideoUrl.isEmpty()) {
+            makeErrorToast(context, Exception("Video URL is empty."))
             return null
         } else {
-            val uri = video.videoUrl!!.toUri()
+            val uri = newVideoUrl.toUri()
 
             val isOnDevice = if (anime.source == LocalAnimeSource.ID) {
                 true

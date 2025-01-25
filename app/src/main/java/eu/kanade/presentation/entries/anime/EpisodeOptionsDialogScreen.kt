@@ -125,7 +125,9 @@ class EpisodeOptionsDialogScreenModel(
 
             val result = withIOContext {
                 try {
-                    val results = EpisodeLoader.getLinks(episode, anime, source)
+                    val hosters = EpisodeLoader.getHosters(episode, anime, source)
+
+                    val results = EpisodeLoader.getVideos(source, hosters.first())
                     Result.success(results)
                 } catch (e: Throwable) {
                     Result.failure(e)
@@ -223,7 +225,7 @@ private fun VideoList(
         Column {
             if (selectedVideo.videoUrl != null && !showAllQualities) {
                 ClickableRow(
-                    text = selectedVideo.quality,
+                    text = selectedVideo.videoTitle,
                     icon = null,
                     onClick = { showAllQualities = true },
                     showDropdownArrow = true,
@@ -283,7 +285,7 @@ private fun VideoList(
             Column {
                 videoList.forEach { video ->
                     ClickableRow(
-                        text = video.quality,
+                        text = video.videoTitle,
                         icon = null,
                         onClick = {
                             selectedVideo = video
