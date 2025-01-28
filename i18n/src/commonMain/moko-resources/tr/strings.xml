@@ -286,7 +286,7 @@
     <string name="logout">Çıkış yap</string>
     <string name="logout_success">Çıkış yaptınız</string>
     <string name="paused">Duraklatıldı</string>
-    <string name="label_more">Daha Fazla</string>
+    <string name="label_more">Diğerleri</string>
     <string name="action_sort_latest_chapter">Son bölüm</string>
     <string name="action_view_chapters">Bölümleri görüntüle</string>
     <string name="action_cancel_all">Hepsini iptal et</string>
