@@ -1150,4 +1150,9 @@
     <string name="rotation_video">ভিডিঅ</string>
     <string name="pref_controls_allow_gestures_in_panels">পেনেলত ইঙ্গিত অনুমতি দিয়ক</string>
     <string name="pref_category_controls">নিয়ন্ত্ৰণসমূহ</string>
+    <string name="pref_controls_show_loading">লোডিং বৃত্ত দেখুৱাওক</string>
+    <string name="pref_controls_show_chapter_indicator">বৰ্তমানৰ অধ্যায় সূচক দেখুৱাওক</string>
+    <string name="pref_controls_show_chapter_indicator_info">ভিডিঅ\'টোত অধ্যায় থাকিলেহে দেখা দিয়ে</string>
+    <string name="pref_controls_display_volume_percentage">শতাংশ হিচাপে আয়তন প্ৰদৰ্শন কৰক</string>
+    <string name="pref_show_system_bar">নিয়ন্ত্ৰণসমূহৰ সৈতে ব্যৱস্থাপ্ৰণালীৰ অৱস্থা বাৰ দেখুৱাওক</string>
 </resources>
