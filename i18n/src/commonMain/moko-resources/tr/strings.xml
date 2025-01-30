@@ -711,7 +711,7 @@
     <string name="action_revert_to_default">Varsayılana dön</string>
     <string name="last_auto_backup_info">Son otomatik yedekleme: %s</string>
     <string name="no_scanlators_found">Çeviren bulunamadı</string>
-    <string name="scanlator">Tareviri</string>
+    <string name="scanlator">Çeviren</string>
     <string name="pref_flash_page">Sayfa değişiminde ışık çak</string>
     <string name="pref_storage_usage">Depolama kullanımı</string>
     <string name="action_sort_tracker_score">İzleyici puanı</string>
