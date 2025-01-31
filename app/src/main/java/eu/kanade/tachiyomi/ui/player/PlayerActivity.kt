@@ -628,10 +628,10 @@ class PlayerActivity : BaseActivity() {
         if (player.isExiting) return
         when (property) {
             "pause" -> {
-                if (value) {
+                if (value && player.paused == true) {
                     viewModel.pause()
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                } else {
+                } else if (!value && player.paused == false) {
                     viewModel.unpause()
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
