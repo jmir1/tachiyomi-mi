@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.components.ArrowModifier
 import eu.kanade.presentation.components.DropdownMenu
 import eu.kanade.presentation.components.IndicatorModifier
@@ -37,6 +38,8 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.IconButtonTokens
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.secondaryItemAlpha
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 enum class EpisodeDownloadAction {
     START,
@@ -49,6 +52,7 @@ enum class EpisodeDownloadAction {
 @Composable
 fun EpisodeDownloadIndicator(
     enabled: Boolean,
+    fileSize: Long?,
     downloadStateProvider: () -> AnimeDownload.State,
     downloadProgressProvider: () -> Int,
     onClick: (EpisodeDownloadAction) -> Unit,
@@ -60,6 +64,7 @@ fun EpisodeDownloadIndicator(
             modifier = modifier,
             onClick = onClick,
         )
+
         AnimeDownload.State.QUEUE, AnimeDownload.State.DOWNLOADING -> DownloadingIndicator(
             enabled = enabled,
             modifier = modifier,
@@ -67,11 +72,14 @@ fun EpisodeDownloadIndicator(
             downloadProgressProvider = downloadProgressProvider,
             onClick = onClick,
         )
+
         AnimeDownload.State.DOWNLOADED -> DownloadedIndicator(
             enabled = enabled,
             modifier = modifier,
             onClick = onClick,
+            fileSize,
         )
+
         AnimeDownload.State.ERROR -> ErrorIndicator(
             enabled = enabled,
             modifier = modifier,
@@ -192,8 +200,21 @@ private fun DownloadedIndicator(
     enabled: Boolean,
     modifier: Modifier = Modifier,
     onClick: (EpisodeDownloadAction) -> Unit,
+    fileSize: Long?,
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
+
+    if (fileSize != null) {
+        Text(
+            text = formatFileSize(fileSize),
+            maxLines = 1,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 12.sp,
+            ),
+        )
+    }
+
     Box(
         modifier = modifier
             .size(IconButtonTokens.StateLayerSize)
@@ -220,6 +241,16 @@ private fun DownloadedIndicator(
                 },
             )
         }
+    }
+}
+
+private fun formatFileSize(fileSize: Long): String {
+    val megaByteSize = fileSize / 1000.0 / 1000.0
+    return if (megaByteSize > 900) {
+        val gigaByteSize = megaByteSize / 1000.0
+        "${BigDecimal(gigaByteSize).setScale(2, RoundingMode.HALF_EVEN)} GB"
+    } else {
+        "${BigDecimal(megaByteSize).setScale(0, RoundingMode.HALF_EVEN)} MB"
     }
 }
 

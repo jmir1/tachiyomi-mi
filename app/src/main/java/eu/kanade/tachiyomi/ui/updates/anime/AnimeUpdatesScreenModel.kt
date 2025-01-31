@@ -425,4 +425,5 @@ data class AnimeUpdatesItem(
     val downloadStateProvider: () -> AnimeDownload.State,
     val downloadProgressProvider: () -> Int,
     val selected: Boolean = false,
+    var fileSize: Long? = null,
 )

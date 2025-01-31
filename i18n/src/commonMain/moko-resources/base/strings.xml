@@ -1337,4 +1337,5 @@
     <string name="download_threads_number_summary">Number of threads to use for downloading, might get your IP blocked if too high, usually 4 is a good number to avoid heavy load on source servers.</string>
     <string name="download_speed_limit">Download speed limit</string>
     <string name="download_speed_limit_hint">Set to 0 to disable the speed limit.</string>
+    <string name="show_downloaded_episode_size">Show downloaded episode size</string>
 </resources>

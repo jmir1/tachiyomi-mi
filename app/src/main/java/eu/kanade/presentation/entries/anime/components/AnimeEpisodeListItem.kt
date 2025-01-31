@@ -59,6 +59,7 @@ fun AnimeEpisodeListItem(
     bookmark: Boolean,
     selected: Boolean,
     downloadIndicatorEnabled: Boolean,
+    fileSize: Long?,
     downloadStateProvider: () -> AnimeDownload.State,
     downloadProgressProvider: () -> Int,
     episodeSwipeStartAction: LibraryPreferences.EpisodeSwipeAction,
@@ -101,6 +102,7 @@ fun AnimeEpisodeListItem(
                     onLongClick = onLongClick,
                 )
                 .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -181,6 +183,7 @@ fun AnimeEpisodeListItem(
                 downloadStateProvider = downloadStateProvider,
                 downloadProgressProvider = downloadProgressProvider,
                 onClick = { onDownloadClick?.invoke(it) },
+                fileSize = fileSize,
             )
         }
     }
