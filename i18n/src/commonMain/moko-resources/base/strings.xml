@@ -649,6 +649,11 @@
     <string name="pref_show_page_number">Show page number</string>
     <string name="pref_show_reading_mode">Show reading mode</string>
     <string name="pref_show_reading_mode_summary">Briefly show current mode when reader is opened</string>
+    <string name="pref_hardware_bitmap_threshold">Custom hardware bitmap threshold</string>
+    <string name="pref_hardware_bitmap_threshold_default">Default (%d)</string>
+    <string name="pref_hardware_bitmap_threshold_summary">If reader loads a blank image incrementally reduce the threshold.\nSelected: %s</string>
+    <string name="pref_always_decode_long_strip_with_ssiv">Always decode long strip images with SSIV</string>
+    <string name="pref_always_decode_long_strip_with_ssiv_summary">Affects performance. Only enable if reducing bitmap threshold doesn\'t fix blank image issues</string>
     <string name="pref_display_profile">Custom display profile</string>
     <string name="pref_crop_borders">Crop borders</string>
     <string name="pref_custom_brightness">Custom brightness</string>
@@ -786,7 +791,7 @@
     <string name="backup_restore_missing_trackers">Trackers not logged into:</string>
     <string name="backup_restore_content_full">You may need to install any missing extensions and log in to tracking services afterwards to use them.</string>
     <string name="restore_completed">Restore completed</string>
-    <string name="restore_duration">%02d min, %02d sec</string>
+    <string name="restore_duration">%1$02d min, %2$02d sec</string>
     <string name="backup_in_progress">Backup is already in progress</string>
     <string name="backup_choice">What do you want to backup?</string>
     <string name="app_settings">App settings</string>
@@ -1233,6 +1238,7 @@
     <string name="pref_clear_anime_database_summary">Delete history for anime that are not saved in your library</string>
     <string name="clear_database_confirmation">Are you sure? Completed episodes and chapters and progress of non-library entries will be lost</string>
     <string name="pref_incognito_mode_summary">Pauses your history</string>
+    <string name="pref_incognito_mode_extension_summary">Pause reading history for extension</string>
     <string name="manga_from_library">Manga from library</string>
     <string name="anime_from_library">Anime from library</string>
     <string name="downloaded_episodes">Downloaded episodes</string>

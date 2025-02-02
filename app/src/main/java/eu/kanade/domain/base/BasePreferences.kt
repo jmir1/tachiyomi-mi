@@ -3,6 +3,7 @@ package eu.kanade.domain.base
 import android.content.Context
 import android.content.pm.PackageManager
 import dev.icerock.moko.resources.StringResource
+import eu.kanade.tachiyomi.util.system.GLUtil
 import tachiyomi.core.common.preference.Preference
 import tachiyomi.core.common.preference.PreferenceStore
 import tachiyomi.i18n.MR
@@ -35,4 +36,8 @@ class BasePreferences(
     }
 
     fun displayProfile() = preferenceStore.getString("pref_display_profile_key", "")
+
+    fun hardwareBitmapThreshold() = preferenceStore.getInt("pref_hardware_bitmap_threshold", GLUtil.SAFE_TEXTURE_LIMIT)
+
+    fun alwaysDecodeLongStripWithSSIV() = preferenceStore.getBoolean("pref_always_decode_long_strip_with_ssiv", false)
 }

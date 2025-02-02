@@ -44,6 +44,7 @@ data class AnimeExtensionDetailsScreen(
             onClickClearCookies = screenModel::clearCookies,
             onClickUninstall = screenModel::uninstallExtension,
             onClickSource = screenModel::toggleSource,
+            onClickIncognito = screenModel::toggleIncognito,
         )
 
         LaunchedEffect(Unit) {

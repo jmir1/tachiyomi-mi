@@ -6,7 +6,9 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import eu.kanade.domain.extension.manga.interactor.GetExtensionSources
 import eu.kanade.domain.extension.manga.interactor.MangaExtensionSourceItem
+import eu.kanade.domain.source.manga.interactor.ToggleMangaIncognito
 import eu.kanade.domain.source.manga.interactor.ToggleMangaSource
+import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.extension.manga.MangaExtensionManager
 import eu.kanade.tachiyomi.extension.manga.model.MangaExtension
 import eu.kanade.tachiyomi.network.NetworkHelper
@@ -19,6 +21,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -36,6 +39,8 @@ class MangaExtensionDetailsScreenModel(
     private val extensionManager: MangaExtensionManager = Injekt.get(),
     private val getExtensionSources: GetExtensionSources = Injekt.get(),
     private val toggleSource: ToggleMangaSource = Injekt.get(),
+    private val toggleIncognito: ToggleMangaIncognito = Injekt.get(),
+    private val preferences: SourcePreferences = Injekt.get(),
 ) : StateScreenModel<MangaExtensionDetailsScreenModel.State>(State()) {
 
     private val _events: Channel<MangaExtensionDetailsEvent> = Channel()
@@ -83,6 +88,15 @@ class MangaExtensionDetailsScreenModel(
                         }
                 }
             }
+            launch {
+                preferences.incognitoMangaExtensions()
+                    .changes()
+                    .map { pkgName in it }
+                    .distinctUntilChanged()
+                    .collectLatest { isIncognito ->
+                        mutableState.update { it.copy(isIncognito = isIncognito) }
+                    }
+            }
         }
     }
 
@@ -121,9 +135,16 @@ class MangaExtensionDetailsScreenModel(
             ?.let { toggleSource.await(it, enable) }
     }
 
+    fun toggleIncognito(enable: Boolean) {
+        state.value.extension?.pkgName?.let { packageName ->
+            toggleIncognito.await(packageName, enable)
+        }
+    }
+
     @Immutable
     data class State(
         val extension: MangaExtension.Installed? = null,
+        val isIncognito: Boolean = false,
         private val _sources: ImmutableList<MangaExtensionSourceItem>? = null,
     ) {
 

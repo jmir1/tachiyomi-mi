@@ -21,16 +21,20 @@ import eu.kanade.domain.items.chapter.interactor.SetReadStatus
 import eu.kanade.domain.items.chapter.interactor.SyncChaptersWithSource
 import eu.kanade.domain.items.episode.interactor.SetSeenStatus
 import eu.kanade.domain.items.episode.interactor.SyncEpisodesWithSource
+import eu.kanade.domain.source.anime.interactor.GetAnimeIncognitoState
 import eu.kanade.domain.source.anime.interactor.GetAnimeSourcesWithFavoriteCount
 import eu.kanade.domain.source.anime.interactor.GetEnabledAnimeSources
 import eu.kanade.domain.source.anime.interactor.GetLanguagesWithAnimeSources
+import eu.kanade.domain.source.anime.interactor.ToggleAnimeIncognito
 import eu.kanade.domain.source.anime.interactor.ToggleAnimeSource
 import eu.kanade.domain.source.anime.interactor.ToggleAnimeSourcePin
 import eu.kanade.domain.source.interactor.SetMigrateSorting
 import eu.kanade.domain.source.interactor.ToggleLanguage
 import eu.kanade.domain.source.manga.interactor.GetEnabledMangaSources
 import eu.kanade.domain.source.manga.interactor.GetLanguagesWithMangaSources
+import eu.kanade.domain.source.manga.interactor.GetMangaIncognitoState
 import eu.kanade.domain.source.manga.interactor.GetMangaSourcesWithFavoriteCount
+import eu.kanade.domain.source.manga.interactor.ToggleMangaIncognito
 import eu.kanade.domain.source.manga.interactor.ToggleMangaSource
 import eu.kanade.domain.source.manga.interactor.ToggleMangaSourcePin
 import eu.kanade.domain.track.anime.interactor.AddAnimeTracks
@@ -370,6 +374,8 @@ class DomainModule : InjektModule {
         addFactory { DeleteAnimeExtensionRepo(get()) }
         addFactory { ReplaceAnimeExtensionRepo(get()) }
         addFactory { UpdateAnimeExtensionRepo(get(), get()) }
+        addFactory { ToggleAnimeIncognito(get()) }
+        addFactory { GetAnimeIncognitoState(get(), get(), get()) }
 
         addSingletonFactory<MangaExtensionRepoRepository> { MangaExtensionRepoRepositoryImpl(get()) }
         addFactory { GetMangaExtensionRepo(get()) }
@@ -378,6 +384,8 @@ class DomainModule : InjektModule {
         addFactory { DeleteMangaExtensionRepo(get()) }
         addFactory { ReplaceMangaExtensionRepo(get()) }
         addFactory { UpdateMangaExtensionRepo(get(), get()) }
+        addFactory { ToggleMangaIncognito(get()) }
+        addFactory { GetMangaIncognitoState(get(), get(), get()) }
 
         addSingletonFactory<CustomButtonRepository> { CustomButtonRepositoryImpl(get()) }
         addFactory { CreateCustomButton(get()) }

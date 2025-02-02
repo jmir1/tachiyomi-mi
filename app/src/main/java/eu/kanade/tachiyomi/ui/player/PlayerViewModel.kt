@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.domain.entries.anime.interactor.SetAnimeViewerFlags
 import eu.kanade.domain.items.episode.model.toDbEpisode
+import eu.kanade.domain.source.anime.interactor.GetAnimeIncognitoState
 import eu.kanade.domain.track.anime.interactor.TrackEpisode
 import eu.kanade.domain.track.service.TrackPreferences
 import eu.kanade.domain.ui.UiPreferences
@@ -148,6 +149,7 @@ class PlayerViewModel @JvmOverloads constructor(
     private val basePreferences: BasePreferences = Injekt.get(),
     private val getCustomButtons: GetCustomButtons = Injekt.get(),
     private val trackSelect: TrackSelect = Injekt.get(),
+    private val getIncognitoState: GetAnimeIncognitoState = Injekt.get(),
     uiPreferences: UiPreferences = Injekt.get(),
 ) : ViewModel() {
 
@@ -994,7 +996,7 @@ class PlayerViewModel @JvmOverloads constructor(
     private val eventChannel = Channel<Event>()
     val eventFlow = eventChannel.receiveAsFlow()
 
-    private val incognitoMode = basePreferences.incognitoMode().get()
+    private val incognitoMode: Boolean by lazy { getIncognitoState.await(currentAnime.value?.source) }
     private val downloadAheadAmount = downloadPreferences.autoDownloadWhileWatching().get()
 
     internal val relativeTime = uiPreferences.relativeTime().get()

@@ -81,6 +81,22 @@ class AnimeExtensionManager(
 
     private var subLanguagesEnabledOnFirstRun = preferences.enabledLanguages().isSet()
 
+    fun getExtensionPackage(sourceId: Long): String? {
+        return installedExtensionsFlow.value.find { extension ->
+            extension.sources.any { it.id == sourceId }
+        }
+            ?.pkgName
+    }
+
+    fun getExtensionPackageAsFlow(sourceId: Long): Flow<String?> {
+        return installedExtensionsFlow.map { extensions ->
+            extensions.find { extension ->
+                extension.sources.any { it.id == sourceId }
+            }
+                ?.pkgName
+        }
+    }
+
     fun getAppIconForSource(sourceId: Long): Drawable? {
         val pkgName = installedExtensionsMapFlow.value.values
             .find { ext ->

@@ -44,6 +44,7 @@ data class MangaExtensionDetailsScreen(
             onClickClearCookies = screenModel::clearCookies,
             onClickUninstall = screenModel::uninstallExtension,
             onClickSource = screenModel::toggleSource,
+            onClickIncognito = screenModel::toggleIncognito,
         )
 
         LaunchedEffect(Unit) {

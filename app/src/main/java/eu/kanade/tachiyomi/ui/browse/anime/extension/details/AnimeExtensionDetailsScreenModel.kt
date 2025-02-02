@@ -6,7 +6,9 @@ import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import eu.kanade.domain.extension.anime.interactor.AnimeExtensionSourceItem
 import eu.kanade.domain.extension.anime.interactor.GetAnimeExtensionSources
+import eu.kanade.domain.source.anime.interactor.ToggleAnimeIncognito
 import eu.kanade.domain.source.anime.interactor.ToggleAnimeSource
+import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.extension.anime.AnimeExtensionManager
 import eu.kanade.tachiyomi.extension.anime.model.AnimeExtension
 import eu.kanade.tachiyomi.network.NetworkHelper
@@ -19,6 +21,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -36,6 +39,8 @@ class AnimeExtensionDetailsScreenModel(
     private val extensionManager: AnimeExtensionManager = Injekt.get(),
     private val getExtensionSources: GetAnimeExtensionSources = Injekt.get(),
     private val toggleSource: ToggleAnimeSource = Injekt.get(),
+    private val toggleIncognito: ToggleAnimeIncognito = Injekt.get(),
+    private val preferences: SourcePreferences = Injekt.get(),
 ) : StateScreenModel<AnimeExtensionDetailsScreenModel.State>(State()) {
 
     private val _events: Channel<AnimeExtensionDetailsEvent> = Channel()
@@ -83,6 +88,15 @@ class AnimeExtensionDetailsScreenModel(
                         }
                 }
             }
+            launch {
+                preferences.incognitoAnimeExtensions()
+                    .changes()
+                    .map { pkgName in it }
+                    .distinctUntilChanged()
+                    .collectLatest { isIncognito ->
+                        mutableState.update { it.copy(isIncognito = isIncognito) }
+                    }
+            }
         }
     }
 
@@ -121,9 +135,16 @@ class AnimeExtensionDetailsScreenModel(
             ?.let { toggleSource.await(it, enable) }
     }
 
+    fun toggleIncognito(enable: Boolean) {
+        state.value.extension?.pkgName?.let { packageName ->
+            toggleIncognito.await(packageName, enable)
+        }
+    }
+
     @Immutable
     data class State(
         val extension: AnimeExtension.Installed? = null,
+        val isIncognito: Boolean = false,
         private val _sources: ImmutableList<AnimeExtensionSourceItem>? = null,
     ) {
 

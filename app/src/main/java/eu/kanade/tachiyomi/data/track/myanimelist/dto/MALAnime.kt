@@ -12,7 +12,7 @@ data class MALAnime(
     val numEpisodes: Long,
     val mean: Double = -1.0,
     @SerialName("main_picture")
-    val covers: MALAnimeCovers,
+    val covers: MALAnimeCovers?,
     val status: String,
     @SerialName("media_type")
     val mediaType: String,
