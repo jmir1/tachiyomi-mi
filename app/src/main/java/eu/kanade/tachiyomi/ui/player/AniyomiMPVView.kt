@@ -49,36 +49,52 @@ class AniyomiMPVView(context: Context, attributes: AttributeSet) : BaseMPVView(c
 
     var isExiting = false
 
+    private fun getPropertyInt(property: String): Int? {
+        return MPVLib.getPropertyInt(property) as Int?
+    }
+
+    private fun getPropertyBoolean(property: String): Boolean? {
+        return MPVLib.getPropertyBoolean(property) as Boolean?
+    }
+
+    private fun getPropertyDouble(property: String): Double? {
+        return MPVLib.getPropertyDouble(property) as Double?
+    }
+
+    private fun getPropertyString(property: String): String? {
+        return MPVLib.getPropertyString(property) as String?
+    }
+
     val duration: Int?
-        get() = MPVLib.getPropertyInt("duration")
+        get() = getPropertyInt("duration")
 
     var timePos: Int?
-        get() = MPVLib.getPropertyInt("time-pos")
+        get() = getPropertyInt("time-pos")
         set(position) = MPVLib.setPropertyInt("time-pos", position!!)
 
     var paused: Boolean?
-        get() = MPVLib.getPropertyBoolean("pause")
+        get() = getPropertyBoolean("pause")
         set(paused) = MPVLib.setPropertyBoolean("pause", paused!!)
 
     val hwdecActive: String
-        get() = MPVLib.getPropertyString("hwdec-current") ?: "no"
+        get() = getPropertyString("hwdec-current") ?: "no"
 
     val videoH: Int?
-        get() = MPVLib.getPropertyInt("video-params/h")
+        get() = getPropertyInt("video-params/h")
 
     /**
      * Returns the video aspect ratio. Rotation is taken into account.
      */
     fun getVideoOutAspect(): Double? {
-        return MPVLib.getPropertyDouble("video-params/aspect")?.let {
+        return getPropertyDouble("video-params/aspect")?.let {
             if (it < 0.001) return 0.0
-            if ((MPVLib.getPropertyInt("video-params/rotate") ?: 0) % 180 == 90) 1.0 / it else it
+            if ((getPropertyInt("video-params/rotate") ?: 0) % 180 == 90) 1.0 / it else it
         }
     }
 
-    class TrackDelegate(private val name: String) {
+    inner class TrackDelegate(private val name: String) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
-            val v = MPVLib.getPropertyString(name)
+            val v = getPropertyString(name)
             // we can get null here for "no" or other invalid value
             return v?.toIntOrNull() ?: -1
         }
