@@ -1249,4 +1249,5 @@
     <string name="pref_player_custom_button_startup">При запуску</string>
     <string name="pref_player_custom_button_id">(ID: %d)</string>
     <string name="custom_button_settings">Спеціальні кнопки</string>
+    <string name="pref_library_rows">Розмір списку</string>
 </resources>
