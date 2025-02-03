@@ -60,7 +60,8 @@ import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import com.hippo.unifile.UniFile
 import eu.kanade.presentation.theme.TachiyomiTheme
-import eu.kanade.tachiyomi.animesource.model.SerializableVideo.Companion.serialize
+import eu.kanade.tachiyomi.animesource.model.Hoster
+import eu.kanade.tachiyomi.animesource.model.SerializableHoster.Companion.serialize
 import eu.kanade.tachiyomi.animesource.model.Video
 import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
@@ -148,14 +149,16 @@ class PlayerActivity : BaseActivity() {
             context: Context,
             animeId: Long?,
             episodeId: Long?,
-            vidList: List<Video>? = null,
+            hostList: List<Hoster>? = null,
+            hostIndex: Int? = null,
             vidIndex: Int? = null,
         ): Intent {
             return Intent(context, PlayerActivity::class.java).apply {
                 putExtra("animeId", animeId)
                 putExtra("episodeId", episodeId)
+                hostIndex?.let { putExtra("hostIndex", it) }
                 vidIndex?.let { putExtra("vidIndex", it) }
-                vidList?.let { putExtra("vidList", it.serialize()) }
+                hostList?.let { putExtra("hostList", it.serialize()) }
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }
         }
@@ -166,8 +169,9 @@ class PlayerActivity : BaseActivity() {
 
         val animeId = intent.extras?.getLong("animeId") ?: -1
         val episodeId = intent.extras?.getLong("episodeId") ?: -1
-        val vidList = intent.extras?.getString("vidList") ?: ""
-        val vidIndex = intent.extras?.getInt("vidIndex") ?: 0
+        val hostList = intent.extras?.getString("hostList") ?: ""
+        val hostIndex = intent.extras?.getInt("hostIndex") ?: -1
+        val vidIndex = intent.extras?.getInt("vidIndex") ?: -1
         if (animeId == -1L || episodeId == -1L) {
             finish()
             return
@@ -182,8 +186,9 @@ class PlayerActivity : BaseActivity() {
 
         lifecycleScope.launchNonCancellable {
             viewModel.updateIsLoadingEpisode(true)
+            viewModel.updateIsLoadingHosters(true)
 
-            val initResult = viewModel.init(animeId, episodeId, vidList, vidIndex)
+            val initResult = viewModel.init(animeId, episodeId, hostList, hostIndex, vidIndex)
             if (!initResult.second.getOrDefault(false)) {
                 val exception = initResult.second.exceptionOrNull() ?: IllegalStateException(
                     "Unknown error",
@@ -193,11 +198,14 @@ class PlayerActivity : BaseActivity() {
                 }
             }
 
+            viewModel.updateIsLoadingHosters(false)
+
             lifecycleScope.launch {
-                setVideoList(
-                    qualityIndex = initResult.first.videoIndex,
-                    videos = initResult.first.videoList,
-                    position = initResult.first.position,
+                viewModel.loadHosters(
+                    source = viewModel.currentSource.value!!,
+                    hosterList = initResult.first.hosterList ?: emptyList(),
+                    hosterIndex = initResult.first.videoIndex.first,
+                    videoIndex = initResult.first.videoIndex.second,
                 )
             }
         }
@@ -218,7 +226,9 @@ class PlayerActivity : BaseActivity() {
         setupPlayerOrientation()
 
         Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
-            toast(throwable.message)
+            runOnUiThread {
+                toast(throwable.message)
+            }
             logcat(LogPriority.ERROR, throwable)
             finish()
         }
@@ -940,15 +950,21 @@ class PlayerActivity : BaseActivity() {
         viewModel.panelShown.update { _ -> Panels.None }
         viewModel.pause()
         viewModel.isLoading.update { _ -> true }
+        viewModel.resetHosterState()
 
         aniskipStamps = emptyList()
 
         lifecycleScope.launch {
             viewModel.updateIsLoadingEpisode(true)
+            viewModel.updateIsLoadingHosters(true)
+            viewModel.cancelHosterVideoLinksJob()
 
             val pipEpisodeToasts = playerPreferences.pipEpisodeToasts().get()
+            val switchMethod = viewModel.loadEpisode(episodeId)
 
-            when (val switchMethod = viewModel.loadEpisode(episodeId)) {
+            viewModel.updateIsLoadingHosters(false)
+
+            when (switchMethod) {
                 null -> {
                     if (viewModel.currentAnime.value != null && !autoPlay) {
                         launchUI { toast(MR.strings.no_next_episode) }
@@ -957,13 +973,21 @@ class PlayerActivity : BaseActivity() {
                 }
 
                 else -> {
-                    if (switchMethod.first != null) {
+                    if (switchMethod.hosterList != null) {
                         when {
-                            switchMethod.first!!.isEmpty() -> setInitialEpisodeError(
-                                Exception("Video list is empty."),
+                            switchMethod.hosterList.isEmpty() -> setInitialEpisodeError(
+                                PlayerViewModel.ExceptionWithStringResource(
+                                    "Hoster list is empty",
+                                    MR.strings.no_hosters,
+                                ),
                             )
                             else -> {
-                                setVideoList(qualityIndex = 0, switchMethod.first!!)
+                                viewModel.loadHosters(
+                                    source = switchMethod.source,
+                                    hosterList = switchMethod.hosterList,
+                                    hosterIndex = -1,
+                                    videoIndex = -1,
+                                )
                             }
                         }
                     } else {
@@ -971,7 +995,7 @@ class PlayerActivity : BaseActivity() {
                     }
 
                     if (isInPictureInPictureMode && pipEpisodeToasts) {
-                        launchUI { toast(switchMethod.second) }
+                        launchUI { toast(switchMethod.episodeTitle) }
                     }
                 }
             }
@@ -985,38 +1009,30 @@ class PlayerActivity : BaseActivity() {
         )
     }
 
-    fun setVideoList(
-        qualityIndex: Int,
-        videos: List<Video>?,
-        fromStart: Boolean = false,
-        position: Long? = null,
-    ) {
+    fun setVideo(video: Video?, position: Long? = null) {
         if (player.isExiting) return
-        viewModel.updateVideoList(videos ?: emptyList())
-        if (videos == null) return
+        if (video == null) return
 
-        videos.getOrNull(qualityIndex)?.let {
-            viewModel.setVideoIndex(qualityIndex)
-            setHttpOptions(it)
-            if (viewModel.isLoadingEpisode.value) {
-                viewModel.currentEpisode.value?.let { episode ->
-                    val preservePos = playerPreferences.preserveWatchingPosition().get()
-                    val resumePosition = position
-                        ?: if ((episode.seen && !preservePos) || fromStart) {
-                            0L
-                        } else {
-                            episode.last_second_seen
-                        }
-                    MPVLib.command(arrayOf("set", "start", "${resumePosition / 1000F}"))
-                }
-            } else {
-                player.timePos?.let {
-                    MPVLib.command(arrayOf("set", "start", "${player.timePos}"))
-                }
+        setHttpOptions(video)
+
+        if (viewModel.isLoadingEpisode.value) {
+            viewModel.currentEpisode.value?.let { episode ->
+                val preservePos = playerPreferences.preserveWatchingPosition().get()
+                val resumePosition = position
+                    ?: if (episode.seen && !preservePos) {
+                        0L
+                    } else {
+                        episode.last_second_seen
+                    }
+                MPVLib.command(arrayOf("set", "start", "${resumePosition / 1000F}"))
             }
-
-            MPVLib.command(arrayOf("loadfile", parseVideoUrl(it.videoUrl)))
+        } else {
+            player.timePos?.let {
+                MPVLib.command(arrayOf("set", "start", "${player.timePos}"))
+            }
         }
+
+        MPVLib.command(arrayOf("loadfile", parseVideoUrl(video.videoUrl)))
     }
 
     /**
@@ -1024,17 +1040,21 @@ class PlayerActivity : BaseActivity() {
      * this case the activity is closed and a toast is shown to the user.
      */
     private fun setInitialEpisodeError(error: Throwable) {
-        toast(error.message)
+        if (error is PlayerViewModel.ExceptionWithStringResource) {
+            toast(error.stringResource)
+        } else {
+            toast(error.message)
+        }
         logcat(LogPriority.ERROR, error)
         finish()
     }
 
-    private fun parseVideoUrl(videoUrl: String?): String? {
+    fun parseVideoUrl(videoUrl: String?): String? {
         return Uri.parse(videoUrl).resolveUri(this)
             ?: videoUrl
     }
 
-    private fun setHttpOptions(video: Video) {
+    fun setHttpOptions(video: Video) {
         if (viewModel.isEpisodeOnline() != true) return
         val source = viewModel.currentSource.value as? AnimeHttpSource ?: return
 
@@ -1128,10 +1148,8 @@ class PlayerActivity : BaseActivity() {
         if (player.isExiting) return
         viewModel.isLoadingTracks.update { _ -> true }
 
-        val audioTracks = viewModel.videoList.value.getOrNull(viewModel.selectedVideoIndex.value)
-            ?.audioTracks?.takeIf { it.isNotEmpty() }
-        val subtitleTracks = viewModel.videoList.value.getOrNull(viewModel.selectedVideoIndex.value)
-            ?.subtitleTracks?.takeIf { it.isNotEmpty() }
+        val audioTracks = viewModel.currentVideo.value?.audioTracks?.takeIf { it.isNotEmpty() }
+        val subtitleTracks = viewModel.currentVideo.value?.subtitleTracks?.takeIf { it.isNotEmpty() }
 
         // If no external audio or subtitle tracks are present, loadTracks() won't be
         // called and we need to call onFinishLoadingTracks() manually
@@ -1154,9 +1172,6 @@ class PlayerActivity : BaseActivity() {
         if (player.isExiting) return
         val anime = viewModel.currentAnime.value ?: return
         val episode = viewModel.currentEpisode.value ?: return
-
-        viewModel.animeTitle.update { _ -> anime.title }
-        viewModel.mediaTitle.update { _ -> episode.name }
 
         // Write to mpv table
         MPVLib.setPropertyString("user-data/current-anime/episode-title", episode.name)

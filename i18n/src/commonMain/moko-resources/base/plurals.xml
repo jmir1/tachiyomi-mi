@@ -124,4 +124,8 @@
         <item quantity="one">Episodes %1$s and %2$d more</item>
         <item quantity="other">Episodes %1$s and %2$d more</item>
     </plurals>
+    <plurals name="hoster_video_count">
+        <item quantity="one">%d video</item>
+        <item quantity="other">%d videos</item>
+    </plurals>
 </resources>

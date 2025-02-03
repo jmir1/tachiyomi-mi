@@ -36,6 +36,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import dev.icerock.moko.resources.StringResource
 import eu.kanade.domain.base.BasePreferences
 import eu.kanade.domain.entries.anime.interactor.SetAnimeViewerFlags
 import eu.kanade.domain.items.episode.model.toDbEpisode
@@ -45,7 +46,8 @@ import eu.kanade.domain.ui.UiPreferences
 import eu.kanade.presentation.more.settings.screen.player.custombutton.CustomButtonFetchState
 import eu.kanade.presentation.more.settings.screen.player.custombutton.getButtons
 import eu.kanade.tachiyomi.animesource.AnimeSource
-import eu.kanade.tachiyomi.animesource.model.SerializableVideo.Companion.toVideoList
+import eu.kanade.tachiyomi.animesource.model.Hoster
+import eu.kanade.tachiyomi.animesource.model.SerializableHoster.Companion.toHosterList
 import eu.kanade.tachiyomi.animesource.model.Video
 import eu.kanade.tachiyomi.animesource.online.AnimeHttpSource
 import eu.kanade.tachiyomi.data.database.models.anime.Episode
@@ -59,7 +61,10 @@ import eu.kanade.tachiyomi.data.track.TrackerManager
 import eu.kanade.tachiyomi.data.track.anilist.Anilist
 import eu.kanade.tachiyomi.data.track.myanimelist.MyAnimeList
 import eu.kanade.tachiyomi.ui.player.controls.components.IndexedSegment
+import eu.kanade.tachiyomi.ui.player.controls.components.sheets.HosterState
+import eu.kanade.tachiyomi.ui.player.controls.components.sheets.getChangedAt
 import eu.kanade.tachiyomi.ui.player.loader.EpisodeLoader
+import eu.kanade.tachiyomi.ui.player.loader.HosterLoader
 import eu.kanade.tachiyomi.ui.player.settings.GesturePreferences
 import eu.kanade.tachiyomi.ui.player.settings.PlayerPreferences
 import eu.kanade.tachiyomi.ui.reader.SaveImageNotifier
@@ -77,9 +82,11 @@ import eu.kanade.tachiyomi.util.system.toast
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.Utils
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -117,6 +124,8 @@ import uy.kohesive.injekt.api.get
 import java.io.File
 import java.io.InputStream
 import java.util.Date
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.coroutines.cancellation.CancellationException
 
 class PlayerViewModelProviderFactory(
     private val activity: PlayerActivity,
@@ -196,10 +205,18 @@ class PlayerViewModel @JvmOverloads constructor(
 
     val isLoadingTracks = MutableStateFlow(true)
 
-    private val _videoList = MutableStateFlow<List<Video>>(emptyList())
-    val videoList = _videoList.asStateFlow()
-    private val _selectedVideoIndex = MutableStateFlow(-1)
-    val selectedVideoIndex = _selectedVideoIndex.asStateFlow()
+    private val _hosterList = MutableStateFlow<List<Hoster>>(emptyList())
+    val hosterList = _hosterList.asStateFlow()
+    private val _isLoadingHosters = MutableStateFlow(true)
+    val isLoadingHosters = _isLoadingHosters.asStateFlow()
+    private val _hosterState = MutableStateFlow<List<HosterState>>(emptyList())
+    val hosterState = _hosterState.asStateFlow()
+    private val _hosterExpandedList = MutableStateFlow<List<Boolean>>(emptyList())
+    val hosterExpandedList = _hosterExpandedList.asStateFlow()
+    private val _selectedHosterVideoIndex = MutableStateFlow(Pair(-1, -1))
+    val selectedHosterVideoIndex = _selectedHosterVideoIndex.asStateFlow()
+    private val _currentVideo = MutableStateFlow<Video?>(null)
+    val currentVideo = _currentVideo.asStateFlow()
 
     private val _chapters = MutableStateFlow<List<IndexedSegment>>(emptyList())
     val chapters = _chapters.asStateFlow()
@@ -248,6 +265,9 @@ class PlayerViewModel @JvmOverloads constructor(
     val panelShown = MutableStateFlow(Panels.None)
     val dialogShown = MutableStateFlow<Dialogs>(Dialogs.None)
 
+    private val _dismissSheet = MutableStateFlow(false)
+    val dismissSheet = _dismissSheet.asStateFlow()
+
     private val _seekText = MutableStateFlow<String?>(null)
     val seekText = _seekText.asStateFlow()
     private val _doubleTapSeekAmount = MutableStateFlow(0)
@@ -278,7 +298,7 @@ class PlayerViewModel @JvmOverloads constructor(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launchIO {
             try {
                 val buttons = getCustomButtons.getAll()
                 buttons.firstOrNull { it.isFavorite }?.let {
@@ -459,29 +479,6 @@ class PlayerViewModel @JvmOverloads constructor(
         _currentChapter.update { chapters.value.getOrNull(index.toInt()) ?: return }
     }
 
-    fun updateVideoList(videoList: List<Video>) {
-        _videoList.update { _ -> videoList }
-    }
-
-    fun setVideoIndex(idx: Int) {
-        _selectedVideoIndex.update { _ -> idx }
-    }
-
-    fun selectVideo(video: Video) {
-        updateIsLoadingEpisode(true)
-
-        val idx = videoList.value.indexOf(video)
-
-        updatePausedState()
-        // Pause until everything has loaded
-        pause()
-
-        activity.setVideoList(
-            qualityIndex = idx,
-            videos = videoList.value,
-        )
-    }
-
     fun addAudio(uri: Uri) {
         val url = uri.toString()
         val isContentUri = url.startsWith("content://")
@@ -549,7 +546,9 @@ class PlayerViewModel @JvmOverloads constructor(
     }
 
     private fun updatePausedState() {
-        _pausedState.update { _ -> paused.value }
+        if (pausedState.value == null) {
+            _pausedState.update { _ -> paused.value }
+        }
     }
 
     private fun setPausedState() {
@@ -621,9 +620,18 @@ class PlayerViewModel @JvmOverloads constructor(
         _areControlsLocked.update { false }
     }
 
+    private fun dismissSheet() {
+        _dismissSheet.update { _ -> true }
+    }
+
+    private fun resetDismissSheet() {
+        _dismissSheet.update { _ -> false }
+    }
+
     fun showSheet(sheet: Sheets) {
         sheetShown.update { sheet }
         if (sheet == Sheets.None) {
+            resetDismissSheet()
             showControls()
         } else {
             hideControls()
@@ -920,6 +928,14 @@ class PlayerViewModel @JvmOverloads constructor(
         if (gesturePreferences.showSeekBar().get()) showSeekBar()
     }
 
+    fun resetHosterState() {
+        _pausedState.update { _ -> false }
+        _hosterState.update { _ -> emptyList() }
+        _hosterList.update { _ -> emptyList() }
+        _hosterExpandedList.update { _ -> emptyList() }
+        _selectedHosterVideoIndex.update { _ -> Pair(-1, -1) }
+    }
+
     fun changeEpisode(previous: Boolean, autoPlay: Boolean = false) {
         if (previous && !hasPreviousEpisode.value) {
             activity.toast(activity.stringResource(MR.strings.no_prev_episode))
@@ -931,7 +947,10 @@ class PlayerViewModel @JvmOverloads constructor(
             return
         }
 
-        activity.changeEpisode(getAdjacentEpisodeId(previous = previous), autoPlay = autoPlay)
+        activity.changeEpisode(
+            episodeId = getAdjacentEpisodeId(previous = previous),
+            autoPlay = autoPlay,
+        )
     }
 
     fun handleLeftDoubleTap() {
@@ -1012,7 +1031,7 @@ class PlayerViewModel @JvmOverloads constructor(
     /**
      * The current video's quality index. Used to restore from process kill.
      */
-    private var qualityIndex = savedState.get<Int>("quality_index") ?: 0
+    private var qualityIndex = savedState.get<Pair<Int, Int>>("quality_index") ?: Pair(-1, -1)
         set(value) {
             savedState["quality_index"] = value
             field = value
@@ -1028,8 +1047,6 @@ class PlayerViewModel @JvmOverloads constructor(
         }
 
     private var episodeToDownload: AnimeDownload? = null
-
-    private var currentVideoList: List<Video>? = null
 
     private fun filterEpisodeList(episodes: List<Episode>): List<Episode> {
         val anime = currentAnime.value ?: return episodes
@@ -1101,6 +1118,12 @@ class PlayerViewModel @JvmOverloads constructor(
         }
     }
 
+    // ====== Initialize anime, episode, hoster, and video list ======
+
+    fun updateIsLoadingHosters(value: Boolean) {
+        _isLoadingHosters.update { _ -> value }
+    }
+
     /**
      * Whether this presenter is initialized yet.
      */
@@ -1108,17 +1131,27 @@ class PlayerViewModel @JvmOverloads constructor(
         return currentAnime.value == null || currentEpisode.value == null
     }
 
-    /**
-     * Initializes this presenter with the given [animeId] and [initialEpisodeId]. This method will
-     * fetch the anime from the database and initialize the episode.
-     */
+    data class InitResult(
+        val hosterList: List<Hoster>?,
+        val videoIndex: Pair<Int, Int>,
+        val position: Long?,
+    )
+
+    private var currentHosterList: List<Hoster>? = null
+
+    class ExceptionWithStringResource(
+        message: String,
+        val stringResource: StringResource,
+    ) : Exception(message)
+
     suspend fun init(
         animeId: Long,
         initialEpisodeId: Long,
-        vidList: String,
+        hostList: String,
+        hostIndex: Int,
         vidIndex: Int,
     ): Pair<InitResult, Result<Boolean>> {
-        val defaultResult = InitResult(currentVideoList, 0, null)
+        val defaultResult = InitResult(currentHosterList, qualityIndex, null)
         if (!needsInit()) return Pair(defaultResult, Result.success(true))
         return try {
             val anime = getAnime.await(animeId)
@@ -1133,20 +1166,19 @@ class PlayerViewModel @JvmOverloads constructor(
                 updateEpisodeList(initEpisodeList(anime))
 
                 val episode = currentPlaylist.value.first { it.id == episodeId }
-                mediaTitle.update { _ -> episode.name }
-
                 val source = sourceManager.getOrStub(anime.source)
 
                 _currentEpisode.update { _ -> episode }
                 _currentSource.update { _ -> source }
-                _isEpisodeOnline.update { _ -> isEpisodeOnline() == true }
+
+                updateEpisode(episode)
 
                 _hasPreviousEpisode.update { _ -> getCurrentEpisodeIndex() != 0 }
                 _hasNextEpisode.update { _ -> getCurrentEpisodeIndex() != currentPlaylist.value.size - 1 }
 
                 // Write to mpv table
                 MPVLib.setPropertyString("user-data/current-anime/anime-title", anime.title)
-                MPVLib.setPropertyInt("user-data/current-anime/intro-length", getAnimeSkipIntroLength())
+                MPVLib.setPropertyInt("user-data/current-anime/intro-length", anime.skipIntroLength)
                 MPVLib.setPropertyString(
                     "user-data/current-anime/category",
                     getAnimeCategories.await(anime.id).joinToString {
@@ -1154,25 +1186,29 @@ class PlayerViewModel @JvmOverloads constructor(
                     },
                 )
 
-                val currentEp = currentEpisode.value ?: throw Exception("No episode loaded.")
-                if (vidList.isNotBlank()) {
-                    currentVideoList = vidList.toVideoList().ifEmpty {
-                        currentVideoList = null
-                        throw Exception("Video selected from empty list?")
+                val currentEp = currentEpisode.value
+                    ?: throw ExceptionWithStringResource("No episode loaded", MR.strings.no_episode_loaded)
+                if (hostList.isNotBlank()) {
+                    currentHosterList = hostList.toHosterList().ifEmpty {
+                        currentHosterList = null
+                        throw ExceptionWithStringResource(
+                            "Hoster selected from empty list",
+                            MR.strings.select_hoster_from_empty_list,
+                        )
                     }
-                    qualityIndex = vidIndex
+                    qualityIndex = Pair(hostIndex, vidIndex)
                 } else {
-                    EpisodeLoader.getLinks(currentEp.toDomainEpisode()!!, anime, source)
+                    EpisodeLoader.getHosters(currentEp.toDomainEpisode()!!, anime, source)
                         .takeIf { it.isNotEmpty() }
-                        ?.also { currentVideoList = it }
+                        ?.also { currentHosterList = it }
                         ?: run {
-                            currentVideoList = null
-                            throw Exception("Video list is empty.")
+                            currentHosterList = null
+                            throw ExceptionWithStringResource("Hoster list is empty", MR.strings.no_hosters)
                         }
                 }
 
                 val result = InitResult(
-                    videoList = currentVideoList,
+                    hosterList = currentHosterList,
                     videoIndex = qualityIndex,
                     position = episodePosition,
                 )
@@ -1186,11 +1222,11 @@ class PlayerViewModel @JvmOverloads constructor(
         }
     }
 
-    data class InitResult(
-        val videoList: List<Video>?,
-        val videoIndex: Int,
-        val position: Long?,
-    )
+    private fun updateEpisode(episode: Episode) {
+        mediaTitle.update { _ -> episode.name }
+        _isEpisodeOnline.update { _ -> isEpisodeOnline() == true }
+        MPVLib.setPropertyDouble("user-data/current-anime/episode-number", episode.episode_number.toDouble())
+    }
 
     private fun initEpisodeList(anime: Anime): List<Episode> {
         val episodes = runBlocking { getEpisodesByAnimeId.await(anime.id) }
@@ -1213,29 +1249,254 @@ class PlayerViewModel @JvmOverloads constructor(
         hasTrackers = tracks.isNotEmpty()
     }
 
-    suspend fun loadEpisode(episodeId: Long?): Pair<List<Video>?, String>? {
+    private var getHosterVideoLinksJob: Job? = null
+
+    fun cancelHosterVideoLinksJob() {
+        getHosterVideoLinksJob?.cancel()
+    }
+
+    /**
+     * Set the video list for hosters.
+     */
+    fun loadHosters(source: AnimeSource, hosterList: List<Hoster>, hosterIndex: Int, videoIndex: Int) {
+        val hasFoundPreferredVideo = AtomicBoolean(false)
+
+        _hosterList.update { _ -> hosterList }
+        _hosterExpandedList.update { _ ->
+            List(hosterList.size) { true }
+        }
+
+        getHosterVideoLinksJob?.cancel()
+        getHosterVideoLinksJob = viewModelScope.launchIO {
+            _hosterState.update { _ ->
+                hosterList.map { hoster ->
+                    if (hoster.videoList == null) {
+                        HosterState.Loading(hoster.hosterName)
+                    } else {
+                        val videoList = hoster.videoList!!
+                        HosterState.Ready(
+                            hoster.hosterName,
+                            videoList,
+                            List(videoList.size) { Video.State.QUEUE },
+                        )
+                    }
+                }
+            }
+
+            try {
+                coroutineScope {
+                    hosterList.mapIndexed { hosterIdx, hoster ->
+                        async {
+                            val hosterState = EpisodeLoader.loadHosterVideos(source, hoster)
+
+                            _hosterState.updateAt(hosterIdx, hosterState)
+
+                            if (hosterState is HosterState.Ready) {
+                                if (hosterIdx == hosterIndex) {
+                                    hosterState.videoList.getOrNull(videoIndex)?.let {
+                                        hasFoundPreferredVideo.set(true)
+                                        val success = loadVideo(source, it, hosterIndex, videoIndex)
+                                        if (!success) {
+                                            hasFoundPreferredVideo.set(false)
+                                        }
+                                    }
+                                }
+
+                                val prefIndex = hosterState.videoList.indexOfFirst { it.preferred }
+                                if (prefIndex != -1 && hosterIndex == -1) {
+                                    if (hasFoundPreferredVideo.compareAndSet(false, true)) {
+                                        if (selectedHosterVideoIndex.value == Pair(-1, -1)) {
+                                            val success =
+                                                loadVideo(
+                                                    source,
+                                                    hosterState.videoList[prefIndex],
+                                                    hosterIdx,
+                                                    prefIndex,
+                                                )
+                                            if (!success) {
+                                                hasFoundPreferredVideo.set(false)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }.awaitAll()
+
+                    if (hasFoundPreferredVideo.compareAndSet(false, true)) {
+                        val (hosterIdx, videoIdx) = HosterLoader.selectBestVideo(hosterState.value)
+                        if (hosterIdx == -1) {
+                            throw ExceptionWithStringResource("No available videos", MR.strings.no_available_videos)
+                        }
+
+                        val video = (hosterState.value[hosterIdx] as HosterState.Ready).videoList[videoIdx]
+
+                        loadVideo(source, video, hosterIdx, videoIdx)
+                    }
+                }
+            } catch (e: CancellationException) {
+                _hosterState.update { _ ->
+                    hosterList.map { HosterState.Idle(it.hosterName) }
+                }
+
+                throw e
+            }
+        }
+    }
+
+    private suspend fun loadVideo(source: AnimeSource?, video: Video, hosterIndex: Int, videoIndex: Int): Boolean {
+        val selectedHosterState = (_hosterState.value[hosterIndex] as? HosterState.Ready) ?: return false
+        updateIsLoadingEpisode(true)
+
+        val oldSelectedIndex = _selectedHosterVideoIndex.value
+        _selectedHosterVideoIndex.update { _ -> Pair(hosterIndex, videoIndex) }
+
+        _hosterState.updateAt(
+            hosterIndex,
+            selectedHosterState.getChangedAt(videoIndex, video, Video.State.LOAD_VIDEO),
+        )
+
+        // Pause until everything has loaded
+        updatePausedState()
+        pause()
+
+        val resolvedVideo = if (selectedHosterState.videoState[videoIndex] != Video.State.READY) {
+            HosterLoader.getResolvedVideo(source, video)
+        } else {
+            video
+        }
+
+        if (resolvedVideo == null || resolvedVideo.videoUrl.isEmpty()) {
+            if (currentVideo.value == null) {
+                _hosterState.updateAt(
+                    hosterIndex,
+                    selectedHosterState.getChangedAt(videoIndex, video, Video.State.ERROR),
+                )
+
+                val (newHosterIdx, newVideoIdx) = HosterLoader.selectBestVideo(hosterState.value)
+                if (newHosterIdx == -1) {
+                    if (_hosterState.value.any { it is HosterState.Loading }) {
+                        _selectedHosterVideoIndex.update { _ -> Pair(-1, -1) }
+                        return false
+                    } else {
+                        throw ExceptionWithStringResource("No available videos", MR.strings.no_available_videos)
+                    }
+                }
+
+                val newVideo = (hosterState.value[newHosterIdx] as HosterState.Ready).videoList[newVideoIdx]
+
+                return loadVideo(source, newVideo, newHosterIdx, newVideoIdx)
+            } else {
+                _selectedHosterVideoIndex.update { _ -> oldSelectedIndex }
+                _hosterState.updateAt(
+                    hosterIndex,
+                    selectedHosterState.getChangedAt(videoIndex, video, Video.State.ERROR),
+                )
+                return false
+            }
+        }
+
+        _hosterState.updateAt(
+            hosterIndex,
+            selectedHosterState.getChangedAt(videoIndex, resolvedVideo, Video.State.READY),
+        )
+
+        _currentVideo.update { _ -> resolvedVideo }
+
+        qualityIndex = Pair(hosterIndex, videoIndex)
+
+        activity.setVideo(resolvedVideo)
+        return true
+    }
+
+    fun onVideoClicked(hosterIndex: Int, videoIndex: Int) {
+        val hosterState = _hosterState.value[hosterIndex] as? HosterState.Ready
+        val video = hosterState?.videoList
+            ?.getOrNull(videoIndex)
+            ?: return // Shouldn't happen, but just in case™
+
+        val videoState = hosterState.videoState
+            .getOrNull(videoIndex)
+            ?: return
+
+        if (videoState == Video.State.ERROR) {
+            return
+        }
+
+        viewModelScope.launchIO {
+            val success = loadVideo(currentSource.value, video, hosterIndex, videoIndex)
+            if (success) {
+                if (sheetShown.value == Sheets.QualityTracks) {
+                    dismissSheet()
+                }
+            } else {
+                updateIsLoadingEpisode(false)
+            }
+        }
+    }
+
+    fun onHosterClicked(index: Int) {
+        when (hosterState.value[index]) {
+            is HosterState.Ready -> {
+                _hosterExpandedList.updateAt(index, !_hosterExpandedList.value[index])
+            }
+            is HosterState.Idle -> {
+                val hosterName = hosterList.value[index].hosterName
+                _hosterState.updateAt(index, HosterState.Loading(hosterName))
+
+                viewModelScope.launchIO {
+                    val hosterState = EpisodeLoader.loadHosterVideos(currentSource.value!!, hosterList.value[index])
+                    _hosterState.updateAt(index, hosterState)
+                }
+            }
+            is HosterState.Loading, is HosterState.Error -> {}
+        }
+    }
+
+    private fun <T> MutableStateFlow<List<T>>.updateAt(index: Int, newValue: T) {
+        this.update { values ->
+            values.toMutableList().apply {
+                this[index] = newValue
+            }
+        }
+    }
+
+    data class EpisodeLoadResult(
+        val hosterList: List<Hoster>?,
+        val episodeTitle: String,
+        val source: AnimeSource,
+    )
+
+    suspend fun loadEpisode(episodeId: Long?): EpisodeLoadResult? {
         val anime = currentAnime.value ?: return null
         val source = sourceManager.getOrStub(anime.source)
 
         val chosenEpisode = currentPlaylist.value.firstOrNull { ep -> ep.id == episodeId } ?: return null
 
         _currentEpisode.update { _ -> chosenEpisode }
-        _isEpisodeOnline.update { _ -> isEpisodeOnline() == true }
+        updateEpisode(chosenEpisode)
 
         return withIOContext {
             try {
-                val currentEpisode = currentEpisode.value ?: throw Exception("No episode loaded.")
-                currentVideoList = EpisodeLoader.getLinks(
+                val currentEpisode =
+                    currentEpisode.value
+                        ?: throw ExceptionWithStringResource("No episode loaded", MR.strings.no_episode_loaded)
+                currentHosterList = EpisodeLoader.getHosters(
                     currentEpisode.toDomainEpisode()!!,
                     anime,
                     source,
                 )
+
                 this@PlayerViewModel.episodeId = currentEpisode.id!!
             } catch (e: Exception) {
                 logcat(LogPriority.ERROR, e) { e.message ?: "Error getting links" }
             }
 
-            Pair(currentVideoList, anime.title + " - " + chosenEpisode.name)
+            EpisodeLoadResult(
+                hosterList = currentHosterList,
+                episodeTitle = anime.title + " - " + chosenEpisode.name,
+                source = source,
+            )
         }
     }
 

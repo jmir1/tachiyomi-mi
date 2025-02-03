@@ -210,6 +210,10 @@
     <string name="pref_remember_brightness">Remember and switch to the last used brightness</string>
     <string name="pref_remember_volume">Remember and switch to the last used volume</string>
 
+    <string name="pref_hosters">Hosters</string>
+    <string name="pref_hosters_show_failure">Display failed hosters</string>
+    <string name="pref_hosters_show_empty">Display empty hosters</string>
+
     <string name="pref_player_fullscreen">Show content in display cutout</string>
     <string name="pref_player_hide_controls">Hide player controls when opening the player</string>
     <string name="pref_show_system_bar">Show system status bar with controls</string>
@@ -370,11 +374,17 @@
     <string name="numeric_chooser_value_too_small">Value too small</string>
     <string name="enable_auto_play">Auto-play is on</string>
     <string name="disable_auto_play">Auto-play is off</string>
-    <string name="no_next_episode">Next Episode not found!</string>
-    <string name="no_prev_episode">Previous Episode not found!</string>
     <string name="player_aniskip_dontskip">Don\'t skip</string>
     <string name="player_aniskip_dontskip_toast">Skipping %s in %d seconds</string>
     <string name="player_aniskip_skip">%s skipped</string>
+
+    <!-- Errors -->
+    <string name="no_next_episode">Next Episode not found!</string>
+    <string name="no_prev_episode">Previous Episode not found!</string>
+    <string name="no_available_videos">No available videos</string>
+    <string name="no_hosters">Hoster list is empty</string>
+    <string name="no_episode_loaded">No episode loaded</string>
+    <string name="select_hoster_from_empty_list">Hoster selected from empty list</string>
 
     <!-- Sheets -->
 
@@ -446,6 +456,10 @@
 
     <!-- Sheets - Audio tracks -->
     <string name="player_sheets_add_ext_audio">Add external audio tracks</string>
+
+    <!-- Sheets - Quality list -->
+    <string name="player_hoster_tap_to_load">Tap to load videos</string>
+    <string name="player_hoster_failed">Failed to load videos</string>
 
     <!-- Sheets - Decoders -->
     <string name="player_sheets_decoder_formatted">%s (%s)</string>

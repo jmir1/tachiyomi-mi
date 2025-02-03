@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.animesource
 
+import eu.kanade.tachiyomi.animesource.model.Hoster
 import eu.kanade.tachiyomi.animesource.model.SAnime
 import eu.kanade.tachiyomi.animesource.model.SEpisode
 import eu.kanade.tachiyomi.animesource.model.Video
@@ -47,6 +48,25 @@ interface AnimeSource {
     suspend fun getEpisodeList(anime: SAnime): List<SEpisode> {
         return fetchEpisodeList(anime).awaitSingle()
     }
+
+    /**
+     * Get the list of hoster for an episode. The first hoster in the list should
+     * be the preferred hoster.
+     *
+     * @since extensions-lib 16
+     * @param episode the episode.
+     * @return the hosters for the episode.
+     */
+    suspend fun getHosterList(episode: SEpisode): List<Hoster> = throw IllegalStateException("Not used")
+
+    /**
+     * Get the list of videos for a hoster.
+     *
+     * @since extensions-lib 16
+     * @param hoster the hoster.
+     * @return the videos for the hoster.
+     */
+    suspend fun getVideoList(hoster: Hoster): List<Video> = throw IllegalStateException("Not used")
 
     /**
      * Get the list of videos a episode has. Pages should be returned

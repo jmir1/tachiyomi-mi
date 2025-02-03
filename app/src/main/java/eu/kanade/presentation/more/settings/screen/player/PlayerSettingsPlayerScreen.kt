@@ -70,6 +70,7 @@ object PlayerSettingsPlayerScreen : SearchableSettings {
                 }.toPersistentMap(),
             ),
             getControlsGroup(playerPreferences = playerPreferences),
+            getHosterGroup(playerPreferences = playerPreferences),
             getDisplayGroup(playerPreferences = playerPreferences),
             if (deviceSupportsPip) getPipGroup(playerPreferences = playerPreferences) else null,
             getExternalPlayerGroup(
@@ -110,6 +111,26 @@ object PlayerSettingsPlayerScreen : SearchableSettings {
                 Preference.PreferenceItem.SwitchPreference(
                     pref = rememberPlayerVolume,
                     title = stringResource(MR.strings.pref_remember_volume),
+                ),
+            ),
+        )
+    }
+
+    @Composable
+    private fun getHosterGroup(playerPreferences: PlayerPreferences): Preference.PreferenceGroup {
+        val showFailure = playerPreferences.showFailedHosters()
+        val showEmpty = playerPreferences.showEmptyHosters()
+
+        return Preference.PreferenceGroup(
+            title = stringResource(MR.strings.pref_hosters),
+            preferenceItems = persistentListOf(
+                Preference.PreferenceItem.SwitchPreference(
+                    pref = showFailure,
+                    title = stringResource(MR.strings.pref_hosters_show_failure),
+                ),
+                Preference.PreferenceItem.SwitchPreference(
+                    pref = showEmpty,
+                    title = stringResource(MR.strings.pref_hosters_show_empty),
                 ),
             ),
         )

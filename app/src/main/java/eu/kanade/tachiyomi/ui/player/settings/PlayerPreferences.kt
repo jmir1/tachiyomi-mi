@@ -28,6 +28,11 @@ class PlayerPreferences(
     fun rememberPlayerVolume() = preferenceStore.getBoolean("pref_remember_volume", false)
     fun playerVolumeValue() = preferenceStore.getFloat("player_volume_value", -1.0F)
 
+    // Hoster
+
+    fun showFailedHosters() = preferenceStore.getBoolean("pref_show_failed_hosters", false)
+    fun showEmptyHosters() = preferenceStore.getBoolean("pref_show_empty_hosters", false)
+
     // Display
 
     fun playerFullscreen() = preferenceStore.getBoolean("player_fullscreen", true)

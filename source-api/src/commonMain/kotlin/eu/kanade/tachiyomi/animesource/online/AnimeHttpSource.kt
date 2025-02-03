@@ -3,6 +3,7 @@ package eu.kanade.tachiyomi.animesource.online
 import eu.kanade.tachiyomi.animesource.AnimeCatalogueSource
 import eu.kanade.tachiyomi.animesource.model.AnimeFilterList
 import eu.kanade.tachiyomi.animesource.model.AnimesPage
+import eu.kanade.tachiyomi.animesource.model.Hoster
 import eu.kanade.tachiyomi.animesource.model.SAnime
 import eu.kanade.tachiyomi.animesource.model.SEpisode
 import eu.kanade.tachiyomi.animesource.model.Video
@@ -292,6 +293,92 @@ abstract class AnimeHttpSource : AnimeCatalogueSource {
     protected abstract fun episodeVideoParse(response: Response): SEpisode
 
     /**
+     * Get the list of hoster for an episode. The first hoster in the list should
+     * be the preferred hoster.
+     *
+     * @since extensions-lib 16
+     * @param episode the episode.
+     * @return the hosters for the episode.
+     */
+    override suspend fun getHosterList(episode: SEpisode): List<Hoster> {
+        return client.newCall(hosterListRequest(episode))
+            .awaitSuccess()
+            .let { response ->
+                hosterListParse(response).sortHosters()
+            }
+    }
+
+    /**
+     * Returns the request for getting the hosters. Override only if it's needed to override
+     * the url, send different headers or request method like POST.
+     *
+     * @since extensions-lib 16
+     * @param episode the episode to look for hosters.
+     * @return the request for getting the hosters.
+     */
+    protected open fun hosterListRequest(episode: SEpisode): Request {
+        return GET(baseUrl + episode.url, headers)
+    }
+
+    /**
+     * Parses the response from the site and returns a list of hosters.
+     *
+     * @since extensions-lib 16
+     * @param response the response from the site.
+     * @return the list of hosters.
+     */
+    protected abstract fun hosterListParse(response: Response): List<Hoster>
+
+    /**
+     * Get the list of videos for a hoster.
+     *
+     * @since extensions-lib 16
+     * @param hoster the hoster.
+     * @return the videos for the hoster.
+     */
+    override suspend fun getVideoList(hoster: Hoster): List<Video> {
+        return client.newCall(videoListRequest(hoster))
+            .awaitSuccess()
+            .let { response ->
+                videoListParse(response, hoster).sortVideos()
+            }
+    }
+
+    /**
+     * Returns the request for getting the hosters. Override only if it's needed to override
+     * the url, send different headers or request method like POST.
+     *
+     * @since extensions-lib 16
+     * @param hoster the hoster to look for videos.
+     * @return the request for getting the videos.
+     */
+    protected open fun videoListRequest(hoster: Hoster): Request {
+        return GET(hoster.hosterUrl, headers)
+    }
+
+    /**
+     * Parses the response from the hoster and returns a list of videos.
+     *
+     * @since extensions-lib 16
+     * @param response the response from the hoster.
+     * @param hoster the hoster.
+     * @return the list of videos.
+     */
+    protected abstract fun videoListParse(response: Response, hoster: Hoster): List<Video>
+
+    /**
+     * Returns the resolved video of the episode link. Override only if it's needed to resolve
+     * the video.
+     *
+     * @since extensions-lib 16
+     * @param video the video information.
+     * @return the resolved video, or null on failure
+     */
+    open suspend fun resolveVideo(video: Video): Video? {
+        return video
+    }
+
+    /**
      * Get the list of videos a episode has. Videos should be returned
      * in the expected order; the index is ignored.
      *
@@ -303,6 +390,7 @@ abstract class AnimeHttpSource : AnimeCatalogueSource {
         return fetchVideoList(episode).awaitSingle()
     }
 
+    @Suppress("DEPRECATION")
     @Deprecated("Use the non-RxJava API instead", replaceWith = ReplaceWith("getVideoList"))
     override fun fetchVideoList(episode: SEpisode): Observable<List<Video>> {
         return client.newCall(videoListRequest(episode))
@@ -330,8 +418,27 @@ abstract class AnimeHttpSource : AnimeCatalogueSource {
     protected abstract fun videoListParse(response: Response): List<Video>
 
     /**
+     * Sorts the hoster list. Override this according to the user's preference.
+     *
+     * @since extensions-lib 16
+     */
+    protected open fun List<Hoster>.sortHosters(): List<Hoster> {
+        return this
+    }
+
+    /**
+     * Sorts the video list. Override this according to the user's preference.
+     *
+     * @since extensions-lib 16
+     */
+    protected open fun List<Video>.sortVideos(): List<Video> {
+        return this
+    }
+
+    /**
      * Sorts the video list. Override this according to the user's preference.
      */
+    @Deprecated("Use .sortVideos() instead", replaceWith = ReplaceWith("sortVideos"))
     protected open fun List<Video>.sort(): List<Video> {
         return this
     }
@@ -362,7 +469,7 @@ abstract class AnimeHttpSource : AnimeCatalogueSource {
      * @param video the chapter whose page list has to be fetched
      */
     protected open fun videoUrlRequest(video: Video): Request {
-        return GET(video.url, headers)
+        return GET(video.videoPageUrl, headers)
     }
 
     /**

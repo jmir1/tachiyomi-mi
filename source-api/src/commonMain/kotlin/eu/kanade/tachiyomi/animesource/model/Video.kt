@@ -9,16 +9,93 @@ import okhttp3.Headers
 @Serializable
 data class Track(val url: String, val lang: String)
 
+@Serializable
+enum class ChapterType {
+    Opening,
+    Ending,
+    Recap,
+    MixedOp,
+    Other,
+}
+
+@Serializable
+data class TimeStamp(
+    val start: Double,
+    val end: Double,
+    val name: String,
+    val type: ChapterType,
+)
+
 open class Video(
-    val url: String = "",
-    val quality: String = "",
-    var videoUrl: String? = null,
+    var videoUrl: String = "",
+    val videoTitle: String = "",
+    val resolution: Int? = null,
+    val bitrate: Int? = null,
     val headers: Headers? = null,
-    // "url", "language-label-2", "url2", "language-label-2"
+    val preferred: Boolean = false,
     val subtitleTracks: List<Track> = emptyList(),
     val audioTracks: List<Track> = emptyList(),
+    val timestamps: List<TimeStamp> = emptyList(),
+    val internalData: String = "",
+    val initialized: Boolean = false,
+    // TODO(1.6): Remove after ext lib bump
+    val videoPageUrl: String = "",
 ) {
 
+    // TODO(1.6): Remove after ext lib bump
+    @Deprecated("Use videoTitle instead", ReplaceWith("videoTitle"))
+    val quality: String
+        get() = videoTitle
+
+    // TODO(1.6): Remove after ext lib bump
+    @Deprecated("Use videoPageUrl instead", ReplaceWith("videoPageUrl"))
+    val url: String
+        get() = videoPageUrl
+
+    // TODO(1.6): Remove after ext lib bump
+    constructor(
+        url: String,
+        quality: String,
+        videoUrl: String?,
+        headers: Headers? = null,
+        subtitleTracks: List<Track> = emptyList(),
+        audioTracks: List<Track> = emptyList(),
+    ) : this(
+        videoPageUrl = url,
+        videoTitle = quality,
+        videoUrl = videoUrl ?: "null",
+        headers = headers,
+        subtitleTracks = subtitleTracks,
+        audioTracks = audioTracks,
+    )
+
+    // TODO(1.6): Remove after ext lib bump
+    constructor(
+        videoUrl: String = "",
+        videoTitle: String = "",
+        resolution: Int? = null,
+        bitrate: Int? = null,
+        headers: Headers? = null,
+        preferred: Boolean = false,
+        subtitleTracks: List<Track> = emptyList(),
+        audioTracks: List<Track> = emptyList(),
+        timestamps: List<TimeStamp> = emptyList(),
+        internalData: String = "",
+    ) : this(
+        videoUrl = videoUrl,
+        videoTitle = videoTitle,
+        resolution = resolution,
+        bitrate = bitrate,
+        headers = headers,
+        preferred = preferred,
+        subtitleTracks = subtitleTracks,
+        audioTracks = audioTracks,
+        timestamps = timestamps,
+        internalData = internalData,
+        videoPageUrl = "",
+    )
+
+    // TODO(1.6): Remove after ext lib bump
     @Suppress("UNUSED_PARAMETER")
     constructor(
         url: String,
@@ -35,6 +112,36 @@ open class Video(
             field = value
         }
 
+    fun copy(
+        videoUrl: String = this.videoUrl,
+        videoTitle: String = this.videoTitle,
+        resolution: Int? = this.resolution,
+        bitrate: Int? = this.bitrate,
+        headers: Headers? = this.headers,
+        preferred: Boolean = this.preferred,
+        subtitleTracks: List<Track> = this.subtitleTracks,
+        audioTracks: List<Track> = this.audioTracks,
+        timestamps: List<TimeStamp> = this.timestamps,
+        internalData: String = this.internalData,
+        initialized: Boolean = this.initialized,
+        videoPageUrl: String = this.videoPageUrl,
+    ): Video {
+        return Video(
+            videoUrl = videoUrl,
+            videoTitle = videoTitle,
+            resolution = resolution,
+            bitrate = bitrate,
+            headers = headers,
+            preferred = preferred,
+            subtitleTracks = subtitleTracks,
+            audioTracks = audioTracks,
+            timestamps = timestamps,
+            internalData = internalData,
+            initialized = initialized,
+            videoPageUrl = videoPageUrl,
+        )
+    }
+
     enum class State {
         QUEUE,
         LOAD_VIDEO,
@@ -45,12 +152,19 @@ open class Video(
 
 @Serializable
 data class SerializableVideo(
-    val url: String = "",
-    val quality: String = "",
-    var videoUrl: String? = null,
+    val videoUrl: String = "",
+    val videoTitle: String = "",
+    val resolution: Int? = null,
+    val bitrate: Int? = null,
     val headers: List<Pair<String, String>>? = null,
+    val preferred: Boolean = false,
     val subtitleTracks: List<Track> = emptyList(),
     val audioTracks: List<Track> = emptyList(),
+    val timestamps: List<TimeStamp> = emptyList(),
+    val internalData: String = "",
+    val initialized: Boolean = false,
+    // TODO(1.6): Remove after ext lib bump
+    val videoPageUrl: String = "",
 ) {
 
     companion object {
@@ -58,12 +172,18 @@ data class SerializableVideo(
             Json.encodeToString(
                 this.map { vid ->
                     SerializableVideo(
-                        vid.url,
-                        vid.quality,
                         vid.videoUrl,
-                        headers = vid.headers?.toList(),
+                        vid.videoTitle,
+                        vid.resolution,
+                        vid.bitrate,
+                        vid.headers?.toList(),
+                        vid.preferred,
                         vid.subtitleTracks,
                         vid.audioTracks,
+                        vid.timestamps,
+                        vid.internalData,
+                        vid.initialized,
+                        vid.videoPageUrl,
                     )
                 },
             )
@@ -72,14 +192,20 @@ data class SerializableVideo(
             Json.decodeFromString<List<SerializableVideo>>(this)
                 .map { sVid ->
                     Video(
-                        sVid.url,
-                        sVid.quality,
                         sVid.videoUrl,
+                        sVid.videoTitle,
+                        sVid.resolution,
+                        sVid.bitrate,
                         sVid.headers
                             ?.flatMap { it.toList() }
                             ?.let { Headers.headersOf(*it.toTypedArray()) },
+                        sVid.preferred,
                         sVid.subtitleTracks,
                         sVid.audioTracks,
+                        sVid.timestamps,
+                        sVid.internalData,
+                        sVid.initialized,
+                        sVid.videoPageUrl,
                     )
                 }
     }
