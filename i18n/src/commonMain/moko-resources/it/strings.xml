@@ -627,7 +627,7 @@
     <string name="track_remove_date_conf_title">Rimuovere la data\?</string>
     <string name="track_remove_finish_date_conf_text">Verrà rimossa la data di fine precedentemente selezionata da %s</string>
     <string name="track_remove_start_date_conf_text">Verrà rimossa la data di inizio precedentemente selezionata da %s</string>
-    <string name="pref_invalidate_download_cache">Download Reindex</string>
+    <string name="pref_invalidate_download_cache">Aggiorna l\'indice dei download</string>
     <string name="label_started">Iniziati</string>
     <string name="label_overview_section">Panoramica</string>
     <string name="label_titles_section">Voci</string>
@@ -804,7 +804,7 @@
     <string name="rotation_sensor_landscape">Sensore landscape</string>
     <string name="pref_category_player_orientation">Orientamento</string>
     <string name="pref_skip_disable">Disabilitato</string>
-    <string name="pref_player_smooth_seek_summary">Se abilitata, la ricerca non si concentrerà sui fotogrammi chiave, portando a una ricerca più lenta ma precisa</string>
+    <string name="pref_player_smooth_seek_summary">Se abilitata, lo scorrimento non si concentrerà sui fotogrammi chiave, rendendo la ricerca più lenta ma precisa</string>
     <string name="pref_player_fullscreen">Mostra contenuti nel display cutout</string>
     <string name="pref_player_hide_controls">Nascondi i controlli del player quando lo avvii</string>
     <string name="pref_pip_on_exit">Passa in modalità PiP quando esci dal player</string>
@@ -820,7 +820,7 @@
     <string name="sort_by_episode_number">Per numero di episodi</string>
     <string name="screenshot_show_subs">Mostra i sottotitoli negli screenshot</string>
     <string name="enable_volume_brightness_gestures">Attiva regolazione Volume e Retroilluminazione attraverso i gesti</string>
-    <string name="enable_horizontal_seek_gesture">Attiva movimento di ricerca orizzontale attraverso i gesti</string>
+    <string name="enable_horizontal_seek_gesture">Attiva il gesto di scorrimento orizzontale</string>
     <string name="information_no_recent_anime">Nulla è stato guardato di recente</string>
     <string name="player_aniskip_op">Salta l\'Opening</string>
     <string name="player_aniskip_mixedOp">Salta MixedOp</string>
@@ -866,7 +866,7 @@
     <string name="want_to_read">Da leggere</string>
     <string name="action_play">Play</string>
     <string name="pref_default_intro_length">Lunghezza skip intro predefinita</string>
-    <string name="pref_player_smooth_seek">Abilita ricerca di precisione</string>
+    <string name="pref_player_smooth_seek">Abilita scorrimento di precisione</string>
     <string name="action_play_internally">Riproduci internamente</string>
     <string name="action_download_unread">Scarica i capitoli non letti</string>
     <string name="action_edit_anime_categories">Modifica categorie anime</string>
@@ -954,7 +954,7 @@
     <string name="pref_search_pinned_anime_sources_only">Ricerca globalmente solo nelle fonti anime appuntate</string>
     <string name="pref_default_home_tab_library">Imposta la schermata iniziale su Manga</string>
     <string name="pref_search_pinned_manga_sources_only">Cerca globalmente solo nelle fonti manga appuntate</string>
-    <string name="pref_category_player_seeking">Ricerco</string>
+    <string name="pref_category_player_seeking">Scorrimento</string>
     <string name="unofficial_anime_extension_message">Questa estensione non è dall\'elenco ufficiale delle estensioni Aniyomi.</string>
     <string name="pref_enable_pip">Abilita l\'uso della modalità PiP</string>
     <string name="pref_category_pip">Picture in Picture (PiP)</string>
@@ -1145,7 +1145,7 @@
     <string name="pref_controls_show_chapter_indicator">Mostra indicatore capitolo corrente</string>
     <string name="pref_controls_show_chapter_indicator_info">Appare solo se il video hai capitoli</string>
     <string name="pref_player_gestures">Gesti</string>
-    <string name="pref_player_gestures_summary">Ricerca, doppio tocco, controlli multimediali</string>
+    <string name="pref_player_gestures_summary">Scorrimento, doppio tocco, controlli multimediali</string>
     <string name="pref_player_subtitle">Sottotitoli</string>
     <string name="pref_player_subtitle_lang_info">Lingua/e dei sottotitoli da selezionare per impostazione predefinita su un video con sottotitoli multipli; funzionano i codici delle lingue a due o tre lettere. I valori multipli possono essere delimitati da una virgola.</string>
     <string name="pref_player_audio">Audio</string>
@@ -1177,12 +1177,12 @@
     <string name="pref_controls_display_volume_percentage">Visualizza volume come percentuale</string>
     <string name="pref_show_system_bar">Mostra la barra di stato di sistema con i controlli</string>
     <string name="pref_reduce_motion">Riduci animatore del player</string>
-    <string name="pref_player_time_to_disappear">Nascondi tempo di controllo del player</string>
+    <string name="pref_player_time_to_disappear">Tempo di scomparsa dei controlli del player</string>
     <string name="pref_player_time_to_disappear_summary">%1$s ms</string>
     <string name="pref_panel_opacity">Opacità pannello</string>
     <string name="pref_category_player_sliders">Cursori</string>
     <string name="pref_controls_swap_vol_brightness">Scambia i cursori del volume e della luminosità</string>
-    <string name="pref_show_seekbar">Mostra la barra dello slider mentre lo utilizzi</string>
+    <string name="pref_show_seekbar">Mostra la barra durante lo scorrimento</string>
     <string name="pref_category_double_tap">Doppio tocco</string>
     <string name="single_action_none">Nessuna</string>
     <string name="single_action_playpause">Riproduci/Pausa</string>
@@ -1250,4 +1250,8 @@
     <string name="player_sheets_more_title">Altro</string>
     <string name="action_sort_random">Casuale</string>
     <string name="action_copy_link">Copia link</string>
+    <string name="action_replace_repo_message">Il repository %1$s ha la stessa impronta della chiave di firma di %2$s.\nSe questo è previsto, %2$s verrà sostituito; in caso contrario, contatta il manutentore del repository.</string>
+    <string name="action_replace_repo_title">La chiave di firma dell\'impronta digitale esiste già</string>
+    <string name="pref_player_audio_channels_auto_safe">Protezione automatica</string>
+    <string name="single_action_seek">Scorri</string>
 </resources>
