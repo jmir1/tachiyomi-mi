@@ -696,7 +696,7 @@
     <string name="exception_unknown_host">Nije bilo moguće povezati se s računalom %s</string>
     <string name="action_move_to_bottom_all_for_series">Pomakni seriju na kraj</string>
     <string name="pref_relative_format">Relativne vremenske oznake</string>
-    <string name="pref_relative_format_summary">\"%1$s\" umjesto \"%2$s\\</string>
+    <string name="pref_relative_format_summary">\"%1$s\" umjesto \"%2$s\"</string>
     <string name="action_sort_category">Razvrstaj kategorije</string>
     <string name="notification_updating_progress">Aktualiziranje biblioteke … (%s)</string>
     <string name="sort_category_confirmation">Želiš li razvrstati kategorije po abecedi\?</string>
@@ -1251,4 +1251,5 @@
     <string name="player_sheets_subtitles_border_style_opaque_box">Neprozirni okvir</string>
     <string name="player_sheets_subtitles_border_style_background_box">Pozadinski okvir</string>
     <string name="custom_button_settings">Prilagođeni gumbi</string>
+    <string name="pref_library_rows">Veličina popisa</string>
 </resources>
