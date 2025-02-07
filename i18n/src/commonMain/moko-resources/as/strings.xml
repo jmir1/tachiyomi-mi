@@ -234,7 +234,7 @@
     <string name="theme_tidalwave">জোৱৰেলি ঢৌ</string>
     <string name="pref_dark_theme_pure_black">বিশুদ্ধ ক\'লা আন্ধাৰ ম\'ড</string>
     <string name="pref_relative_format">অনুমান সময়সূচী</string>
-    <string name="pref_relative_format_summary">\"%2$s\" ৰ পৰিবৰ্তে \"%1$s\\</string>
+    <string name="pref_relative_format_summary">\"%2$s\" ৰ পৰিবৰ্তে \"%1$s\"</string>
     <string name="pref_date_format">তাৰিখৰ বিন্যাস</string>
     <string name="pref_manage_notifications">জাননীসমূহ পৰিচালনা কৰক</string>
     <string name="pref_app_language">এপপৰ ভাষা</string>
@@ -1247,4 +1247,5 @@
     <string name="pref_audio_pitch_correction_summary">দ্ৰুত গতিত অডিঅ’ উচ্চ-পিচ আৰু লেহেমীয়া গতিত কম-পিচ হোৱাত বাধা দিয়ে</string>
     <string name="player_sheets_subtitles_footer_secondary_sid_no_styles">মাধ্যমিক উপশিৰোনামাত কোনো ASS/SSA Styling নাথাকিব।</string>
     <string name="custom_button_settings">কাষ্টম বুটামসমূহ</string>
+    <string name="pref_library_rows">তালিকাৰ আকাৰ</string>
 </resources>
