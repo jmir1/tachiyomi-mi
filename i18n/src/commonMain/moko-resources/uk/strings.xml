@@ -1230,4 +1230,24 @@
     <string name="pref_audio_pitch_correction_title">Увімкнути корекцію висоти звуку</string>
     <string name="pref_audio_pitch_correction_summary">Запобігає тому, щоб звук став високим на вищих швидкостях і низьким на низьких швидкостях</string>
     <string name="player_sheets_subtitles_footer_secondary_sid_no_styles">Додаткові субтитри не матимуть стилю ASS/SSA.</string>
+    <string name="pref_category_player_sliders">Повзунки</string>
+    <string name="player_sheets_sub_typography_border_style">Стиль кордону</string>
+    <string name="pref_player_custom_button">Спеціальні кнопки</string>
+    <string name="pref_player_custom_button_summary">Виконайте код lua за допомогою спеціальних кнопок</string>
+    <string name="pref_player_custom_button_header">Редагувати спеціальні кнопки</string>
+    <string name="pref_player_custom_button_guide">Керівництво по власним кнопкам</string>
+    <string name="pref_player_custom_button_empty">У вас немає спеціальних кнопок. Торкніться кнопки з плюсом, щоб створити спеціальну кнопку.</string>
+    <string name="pref_player_custom_button_add">Додати кнопку</string>
+    <string name="pref_player_custom_button_edit">Кнопка редагування</string>
+    <string name="pref_player_custom_button_title">Назва</string>
+    <string name="pref_player_custom_button_error_exists">Кнопка вже існує!</string>
+    <string name="pref_player_custom_button_content">Код Lua</string>
+    <string name="pref_player_custom_button_content_long">Код Lua (при тривалому натисканні)</string>
+    <string name="pref_player_custom_button_optional">(необов\'язковий)</string>
+    <string name="pref_player_custom_button_delete">Видалити кнопку</string>
+    <string name="pref_player_custom_button_delete_confirm">Ви бажаєте видалити кнопку %s?</string>
+    <string name="pref_player_custom_button_startup">При запуску</string>
+    <string name="pref_player_custom_button_id">(ID: %d)</string>
+    <string name="custom_button_settings">Спеціальні кнопки</string>
+    <string name="pref_library_rows">Розмір списку</string>
 </resources>

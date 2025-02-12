@@ -33,7 +33,7 @@
     <string name="action_bookmark">Bölüme yer imi ekle</string>
     <string name="action_remove_bookmark">Bölümün yer imini kaldır</string>
     <string name="action_delete">Sil</string>
-    <string name="action_update_library">Kitaplığı güncelle</string>
+    <string name="action_update_library">Kütüphaneyi güncelle</string>
     <string name="action_edit">Düzenle</string>
     <string name="action_add">Ekle</string>
     <string name="action_add_category">Kategori ekle</string>
@@ -154,9 +154,9 @@
     <string name="pref_download_new">Yeni bölümleri indir</string>
     <string name="services">İzleyiciler</string>
     <string name="pref_create_backup">Yedek oluştur</string>
-    <string name="pref_create_backup_summ">Şu anki kitaplığı geri yüklemek için kullanılabilir</string>
+    <string name="pref_create_backup_summ">Şu anki kütüphaneyi geri yüklemek için kullanılabilir</string>
     <string name="pref_restore_backup">Yedeği geri yükle</string>
-    <string name="pref_restore_backup_summ">Kitaplığı yedek dosyasından geri yükle</string>
+    <string name="pref_restore_backup_summ">Kütüphaneyi yedek dosyasından geri yükle</string>
     <string name="pref_backup_interval">Otomatik yedekleme sıklığı</string>
     <string name="backup_created">Yedek oluşturuldu</string>
     <string name="restore_completed">Geri yükleme tamamlandı</string>
@@ -169,7 +169,7 @@
     <string name="pref_clear_cookies">Çerezleri temizle</string>
     <string name="cookies_cleared">Çerezler temizlendi</string>
     <string name="pref_clear_database">Veritabanını temizle</string>
-    <string name="pref_clear_database_summary">Kitaplığına kaydedilmeyen girdilerin geçmiş bilgisini sil</string>
+    <string name="pref_clear_database_summary">Kütüphaneye kaydedilmeyen girdilerin geçmiş bilgisini sil</string>
     <string name="clear_database_completed">Girdiler silindi</string>
     <string name="version">Sürüm</string>
     <string name="login_title">%1$s \'e giriş yap</string>
@@ -189,7 +189,7 @@
     <string name="unknown">Bilinmiyor</string>
     <string name="licensed">Lisanslı</string>
     <string name="remove_from_library">Kütüphaneden kaldır</string>
-    <string name="manga_added_library">Kitaplığa eklendi</string>
+    <string name="manga_added_library">Kütüphaneye eklendi</string>
     <string name="manga_removed_library">Kütüphaneden kaldırıldı</string>
     <string name="delete_downloads_for_manga">İndirilen bölümler silinsin mi?</string>
     <string name="copied_to_clipboard">Panoya kopyalandı:
@@ -246,7 +246,7 @@
     <string name="information_no_recent">Yeni güncelleme yok</string>
     <string name="information_no_recent_manga">Yakında okunan yok</string>
     <string name="information_empty_library">Kütüphaneniz boş</string>
-    <string name="information_empty_category">Kategoriniz yok. Kitaplığınızı düzenlemek için artı butonuna basarak bir tane oluşturun.</string>
+    <string name="information_empty_category">Kategoriniz yok. Kütüphanenizi düzenlemek için artı butonuna basarak bir tane oluşturun.</string>
     <string name="download_notifier_downloader_title">İndirici</string>
     <string name="download_notifier_title_error">Hata</string>
     <string name="download_notifier_unknown_error">Bölüm, beklenmeyen hata sonucu indirilemedi</string>
@@ -286,7 +286,7 @@
     <string name="logout">Çıkış yap</string>
     <string name="logout_success">Çıkış yaptınız</string>
     <string name="paused">Duraklatıldı</string>
-    <string name="label_more">Daha Fazla</string>
+    <string name="label_more">Diğerleri</string>
     <string name="action_sort_latest_chapter">Son bölüm</string>
     <string name="action_view_chapters">Bölümleri görüntüle</string>
     <string name="action_cancel_all">Hepsini iptal et</string>
@@ -334,7 +334,7 @@
     <string name="action_pin">Sabitle</string>
     <string name="add_tracking">İzleme ekle</string>
     <string name="in_library">Kütüphanede</string>
-    <string name="add_to_library">Kitaplığa ekle</string>
+    <string name="add_to_library">Kütüphaneye ekle</string>
     <string name="manga_info_collapse">Daha az</string>
     <string name="manga_info_expand">Daha fazla</string>
     <string name="website">Web sitesi</string>
@@ -362,7 +362,7 @@
     <string name="backup_restore_missing_sources">Eksik kaynaklar:</string>
     <string name="invalid_backup_file_missing_manga">Yedek, bir kütüphane girdisi içermiyor.</string>
     <string name="invalid_backup_file">Geçersiz yedekleme dosyası:</string>
-    <string name="pref_library_update_refresh_metadata_summary">Kitaplığı güncellerken yeni kapak ve ayrıntılar için kontrol et</string>
+    <string name="pref_library_update_refresh_metadata_summary">Kütüphaneyi güncellerken yeni kapak ve ayrıntılar için kontrol et</string>
     <string name="pref_library_update_refresh_metadata">Üst veriyi otomatik olarak yenile</string>
     <string name="action_migrate">Taşı</string>
     <string name="action_display_comfortable_grid">Rahat ızgara</string>
@@ -484,7 +484,7 @@
     <string name="action_start_downloading_now">Şimdi indirmeye başla</string>
     <string name="about_dont_kill_my_app">Bazı üreticilerin arka plan hizmetlerini durduran ek uygulama kısıtlamaları vardır. Bu web sitesi bu durumun nasıl düzeltileceği hakkında daha fazla bilgi verir.</string>
     <string name="restore_miui_warning">Yedekleme/geri yükleme, MIUI iyileştirmesi devre dışıysa düzgün çalışmayabilir.</string>
-    <string name="enhanced_tracking_info">Belirli kaynaklar için gelişmiş özellikler sağlar. Girdiler, kitaplığınıza eklendiğinde kendiliğinden izlenir.</string>
+    <string name="enhanced_tracking_info">Belirli kaynaklar için gelişmiş özellikler sağlar. Girdiler, kütüphaneye eklendiğinde kendiliğinden izlenir.</string>
     <string name="enhanced_services">Gelişmiş izleyiciler</string>
     <string name="pref_dark_theme_pure_black">Tamamen siyah karanlık mod</string>
     <string name="theme_yotsuba">Yotsuba</string>
@@ -656,9 +656,7 @@
     <string name="copied_to_clipboard_plain">Panoya kopyalandı</string>
     <string name="enhanced_services_not_installed">Kullanılabilir ancak kaynak kurulu değil: %s</string>
     <string name="pref_skip_dupe_chapters">Yinelenen bölümleri atla</string>
-    <string name="confirm_add_duplicate_manga">Kitaplığınızda aynı ada sahip bir girdiniz var.
-\n
-\nYine de devam etmek istiyor musunuz\?</string>
+    <string name="confirm_add_duplicate_manga">Kütüphanenizde aynı ada sahip bir girdiniz var. \n \nYine de devam etmek istiyor musunuz?</string>
     <string name="track_error">%1$s hatası: %2$s</string>
     <string name="information_required_plain">*gerekli</string>
     <string name="pref_hide_in_library_items">Kütüphanede zaten bulunan girdileri gizle</string>
@@ -713,7 +711,7 @@
     <string name="action_revert_to_default">Varsayılana dön</string>
     <string name="last_auto_backup_info">Son otomatik yedekleme: %s</string>
     <string name="no_scanlators_found">Çeviren bulunamadı</string>
-    <string name="scanlator">Tareviri</string>
+    <string name="scanlator">Çeviren</string>
     <string name="pref_flash_page">Sayfa değişiminde ışık çak</string>
     <string name="pref_storage_usage">Depolama kullanımı</string>
     <string name="action_sort_tracker_score">İzleyici puanı</string>
@@ -1234,4 +1232,22 @@
     <string name="player_sheets_tracks_off">Kapalı</string>
     <string name="pref_category_player_sliders">Kaydırıcılar</string>
     <string name="player_sheets_sub_typography_border_style">Kenar stili</string>
+    <string name="pref_player_custom_button_summary">Özel butonlarla lua kodları çalıştırın</string>
+    <string name="pref_player_custom_button_header">Özel butonları düzenle</string>
+    <string name="pref_player_custom_button_empty">Özel buton ayarlamadınız. Bir özel buton oluşturmak için artı butonuna dokunun.</string>
+    <string name="pref_player_custom_button_edit">Butonu düzenle</string>
+    <string name="pref_player_custom_button_title">Başlık</string>
+    <string name="pref_player_custom_button_error_exists">Buton zaten var!</string>
+    <string name="pref_player_custom_button_content">Lua kodu</string>
+    <string name="pref_player_custom_button_content_long">Lua kodu (uzun dokunma)</string>
+    <string name="pref_player_custom_button_optional">(isteğe bağlı)</string>
+    <string name="pref_player_custom_button_delete">Butonu sil</string>
+    <string name="pref_player_custom_button_delete_confirm">%s butonunu silmek istediğinize emin misiniz?</string>
+    <string name="pref_player_custom_button_startup">Başlangıçta</string>
+    <string name="pref_player_custom_button_id">(ID: %d)</string>
+    <string name="pref_player_custom_button">Özel butonlar</string>
+    <string name="custom_button_settings">Özel butonlar</string>
+    <string name="pref_player_custom_button_add">Buton ekle</string>
+    <string name="pref_player_custom_button_guide">Özel butonlar rehberi</string>
+    <string name="pref_library_rows">Liste boyutu</string>
 </resources>
