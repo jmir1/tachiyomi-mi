@@ -183,6 +183,7 @@ internal fun PreferenceItem(
                     },
                     singleLine = false,
                     canBeBlank = item.canBeBlank,
+                    formatSubtitle = false,
                 )
             }
             is Preference.PreferenceItem.EditTextInfoPreference -> {

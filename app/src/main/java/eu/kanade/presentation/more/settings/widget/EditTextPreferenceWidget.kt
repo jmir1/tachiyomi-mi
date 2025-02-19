@@ -37,12 +37,13 @@ fun EditTextPreferenceWidget(
     onConfirm: suspend (String) -> Boolean,
     singleLine: Boolean = true,
     canBeBlank: Boolean = false,
+    formatSubtitle: Boolean = true,
 ) {
     var isDialogShown by remember { mutableStateOf(false) }
 
     TextPreferenceWidget(
         title = title,
-        subtitle = subtitle?.format(value),
+        subtitle = if (formatSubtitle) subtitle?.format(value) else subtitle,
         icon = icon,
         onPreferenceClick = { isDialogShown = true },
     )
