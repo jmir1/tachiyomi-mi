@@ -41,6 +41,8 @@ fun BrowseAnimeSourceContent(
     source: AnimeSource?,
     animeList: LazyPagingItems<StateFlow<Anime>>,
     columns: GridCells,
+    entries: Int = 0,
+    topBarHeight: Int = 0,
     displayMode: LibraryDisplayMode,
     snackbarHostState: SnackbarHostState,
     contentPadding: PaddingValues,
@@ -129,6 +131,8 @@ fun BrowseAnimeSourceContent(
         LibraryDisplayMode.List -> {
             BrowseAnimeSourceList(
                 animeList = animeList,
+                entries = entries,
+                topBarHeight = topBarHeight,
                 contentPadding = contentPadding,
                 onAnimeClick = onAnimeClick,
                 onAnimeLongClick = onAnimeLongClick,

@@ -134,6 +134,16 @@ class BrowseMangaSourceScreenModel(
         return if (columns == 0) GridCells.Adaptive(128.dp) else GridCells.Fixed(columns)
     }
 
+    // returns the number from the size slider
+    fun getColumnsPreferenceForCurrentOrientation(orientation: Int): Int {
+        val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+        return if (isLandscape) {
+            libraryPreferences.mangaLandscapeColumns()
+        } else {
+            libraryPreferences.mangaPortraitColumns()
+        }.get()
+    }
+
     fun resetFilters() {
         if (source !is CatalogueSource) return
 

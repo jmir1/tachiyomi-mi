@@ -41,6 +41,8 @@ fun BrowseSourceContent(
     source: MangaSource?,
     mangaList: LazyPagingItems<StateFlow<Manga>>,
     columns: GridCells,
+    entries: Int = 0,
+    topBarHeight: Int = 0,
     displayMode: LibraryDisplayMode,
     snackbarHostState: SnackbarHostState,
     contentPadding: PaddingValues,
@@ -129,6 +131,8 @@ fun BrowseSourceContent(
         LibraryDisplayMode.List -> {
             BrowseMangaSourceList(
                 mangaList = mangaList,
+                entries = entries,
+                topBarHeight = topBarHeight,
                 contentPadding = contentPadding,
                 onMangaClick = onMangaClick,
                 onMangaLongClick = onMangaLongClick,
